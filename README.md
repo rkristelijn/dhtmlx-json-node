@@ -3,8 +3,8 @@
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
 # Plan
-  - [ ] Create static html page in Node
-  - [ ] Get dhx up and running
+  - [x] Create static html page in Node
+  - [x] Get dhx up and running
   - [ ] Initialize the layout, grid and form with static data
   - [ ] Create and connect REST API
 
@@ -52,6 +52,49 @@ Let's save our work using `git add.`, `git commit -a -m "blablabla"` and `git pu
 
 # Step 2: Get dhx up and running
 
+Instead of sending a string, we will send a static html page.
+
+A few notes; 
+- as of August 2016 [dhx provides a CDN](https://dhtmlx.com/blog/support-updates-dhtmlx-cdn-new-snippet-tool/) so we don't have to download the javascript files.
+- WCAG dictates a page should have a language
+
+Create `index.html`:
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="//cdn.dhtmlx.com/edge/dhtmlx.css">
+  <script src="//cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+</head>
+
+<body>
+  <script type="text/javascript">
+    dhtmlxEvent(window, "load", function () {
+      dhtmlx.message({ type: "alert", text: "Hello world" });
+    });
+  </script>
+</body>
+
+</html>
+```
+
+Update `index.js`:
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  // step2: instead of sending a string, we send a file
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.listen(3000, () => {
+  console.log('listening on *:3000');
+});
+```
+Restart your node application and enjoy the majesty.
+
 # Step 3: Initialize the layout, grid and form with static data
 
 # Step 4: Create and connect REST API
@@ -60,4 +103,4 @@ Let's save our work using `git add.`, `git commit -a -m "blablabla"` and `git pu
 
 ## Create a branch
 
-`git checkout -b step1'
+`git checkout -b step1`

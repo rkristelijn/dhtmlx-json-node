@@ -95,6 +95,8 @@ app.listen(3000, () => {
 ```
 Restart your node application and enjoy the majesty.
 
+![Screenshot of dhtmlx with only a modal dialogue saying hello world](/tutorial_images/Screenshot_20180523_102030.png)
+
 # Step 3: Initialize the layout, grid and form with static data
 
 # Step 4: Create and connect REST API

@@ -15,3 +15,9 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 # Step 3: Initialize the layout, grid and form with static data
 
 # Step 4: Create and connect REST API
+
+# References
+
+## Create a branch
+
+`git checkout -b step1'

@@ -48,7 +48,7 @@ app.listen(3000, () => {
 ```
 That is all you need to create a simple node app. You can either use `node .` or `npm start` to fire up your application and point your browser to `http://localhost:3000`
 
-Let's save our work using `git commit -a -m "blablabla"` and `git push`
+Let's save our work using `git add.`, `git commit -a -m "blablabla"` and `git push`
 
 # Step 2: Get dhx up and running
 

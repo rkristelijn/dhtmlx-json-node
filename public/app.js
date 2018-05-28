@@ -25,68 +25,6 @@ var A = {
   }
 };
 
-function showLoader() {
-  // var t = document.createElement("DIV");
-  // t.className = "app_loader";
-  // t.innerHTML = '<div class="app_loader_logo"><div class="app_loader_icon"> </div></div>';
-  // document.body.appendChild(t);
-  // t.firstChild.style.marginTop = Math.round((window.innerHeight || document.documentElement.offsetHeight) / 2 - t.firstChild.offsetHeight / 2) + "px";
-  // A.loader = { bg: t };
-  // t = null;
-}
-function hideLoader() {
-  // if (A.loader.tr == null) A.loader.tr = window.dhx4.transDetect();
-  // if (A.loader.tr.transProp !== false) {
-  //   A.loader.bg.addEventListener(A.loader.tr.transEv, unloadLoader, false);
-  //   A.loader.bg.className = "app_loader app_loader_hidden";
-  // } else {
-  //   unloadLoader();
-  // }
-
-}
-function unloadLoader(e) {
-  // if (A.loader.tr.transProp != false) {
-  //   A.loader.bg.removeEventListener(A.loader.tr.transEv, unloadLoader, false);
-  // }
-  // A.loader.bg.parentNode.removeChild(A.loader.bg);
-  // A.loader.bg = A.loader.tr = null;
-  // A.loader = null;
-  // delete A.loader;
-}
-
-// app enter-point
-function doOnLoad() {
-  // apply device-related css
-  // document.body.className = "device_type_" + A.deviceType;
-  // // show loader
-  // showLoader();
-  // // build modules to load
-  // var k = [];
-  // for (var a in A.modules) {
-  //   for (var q = 0; q < A.modules[a].length; q++) {
-  //     if (a == "dhtmlx") k.push("codebase/dhtmlx/" + A.modules[a][q] + ".js");
-  //     if (a == "app") k.push("codebase/app/" + A.deviceType + "/" + A.modules[a][q] + ".js");
-  //     if (a == "common") k.push("codebase/app/" + A.modules[a][q] + ".js");
-  //   }
-  // }
-  // A.modules = k;
-  // // start loading
-  // loadModule();
-};
-
-// load single module with requirejs
-function loadModule(name) {
-  if (A.modules.length == 0) {
-    window.dhx4.callEvent("init", []);
-    //window.setTimeout(hideLoader, 500);
-  } else {
-    // require([A.modules[0]+(A.cache?"?r="+new Date().getTime():"")], function(){
-    // 	var name = A.modules.shift();
-    // 	loadModule(name);
-    // });
-  }
-};
-
 // app unload
 function doOnUnload() {
   if (typeof (window.addEventListener) == "function") {
@@ -110,14 +48,11 @@ function doOnRotate(e) {
 
 // page-load event
 if (typeof (window.addEventListener) == "function") {
-  window.addEventListener("load", doOnLoad, false);
-  window.addEventListener("unload", doOnUnload, false);
   window.addEventListener("orientationchange", doOnRotate, false);
 } else {
   window.attachEvent("onload", doOnLoad);
   window.attachEvent("onunload", doOnUnload);
 }
-
 
 var mainSidebar;
 var mainToolbar;
@@ -154,7 +89,6 @@ function appInit() {
 
   // select 'Contacts' by default
   mainSidebar.cells("contacts").setActive(true);
-  //unloadLoader();
 }
 
 function appUnload() {
@@ -173,9 +107,7 @@ var contactsLayout;
 var contactsForm;
 
 function contactsInit(cell) {
-
   if (contactsLayout == null) {
-
     // init layout
     contactsLayout = cell.attachLayout("2U");
     contactsLayout.cells("a").hideHeader();
@@ -205,7 +137,6 @@ function contactsInit(cell) {
     contactsForm.setSizes = contactsForm.centerForm;
     contactsForm.setSizes();
   }
-
 }
 
 /// PROJECTS
@@ -217,7 +148,6 @@ var projectsChartId;
 var projectsForm;
 
 function projectsInit(cell) {
-
   if (projectsLayout == null) {
 
     // init layout
@@ -262,7 +192,6 @@ function projectsInit(cell) {
       ]
     });
   }
-
 }
 
 function updateChart(id) {
@@ -342,23 +271,14 @@ function eventsInit(cell) {
     });
 
     eventsDataView.load(A.server + "events.xml?type=" + A.deviceType);
-
     eventsDataView.attachEvent("onAfterSelect", function (id) {
-      //var i = eventsDataView.item(id);
-      //eventsMap.setCenter(new google.maps.LatLng(Number(i.lat), Number(i.lng)))
-      //eventsMap.setZoom(11);
     });
-
-    // map
-    //eventsMap = eventsLayout.cells("b").attachMap();
   }
-
 }
 
 window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
   if (id == "events") eventsInit(cell);
 });
-
 
 /// SETTINGS
 var settingsDataView;
@@ -409,9 +329,7 @@ function settingsInit(cell) {
       settingsForm.setSizes = settingsForm.centerForm;
       settingsForm.setSizes();
     });
-
   }
-
 }
 
 window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
@@ -622,7 +540,3 @@ function contactsGridBold(r, index) {
 window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
   if (id == "contacts") contactsInit(cell);
 });
-// dhtmlxEvent(window, "load", appInit);
-// dhtmlxEvent(window, "beforeunload", appUnload);
-
-// dhtmlxEvent(window, "load", appInit);

@@ -279,9 +279,47 @@ The application looks now like this, and no console errors.
 
 ![Screenshot of dhtmlx with the settings tile opened showing tiles and a form](/tutorial_images/Screenshot_20180528_112153.png)
 
+# Step 3 a: Change XML to JSON
+
+JSON is much more lightweight than XML. 
+
 # Step 4: Create and connect REST API
 
 # References
+
+## DHTMLX
+
+Most important, the [dhtmlx](https://docs.dhtmlx.com/index.html) API refences:
+
+
+### Layout 
+
+|[Accordion](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)| [Carousel](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html) | [Layout](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) | [Popup](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html) | [Tabbar](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) | [Windows](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_accordion.png)](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)|[![icon](/tutorial_images/dhx_icons/icon_carousel.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html)|[![icon](/tutorial_images/dhx_icons/icon_layout.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) |[![icon](/tutorial_images/dhx_icons/icon_popup.png)](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html)|[![icon](/tutorial_images/dhx_icons/icon_tabbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) |[![icon](/tutorial_images/dhx_icons/icon_windows.png)](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) 
+
+### Data Components 
+
+|[Chart](https://docs.dhtmlx.com/api__refs__dhtmlchart.html)| [DataView](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html) | [Grid](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) | [List](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html) | [TreeGrid](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) | [TreeView](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_chart.png)](https://docs.dhtmlx.com/api__refs__dhtmlxchart.html)|[![icon](/tutorial_images/dhx_icons/icon_dataview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html)|[![icon](/tutorial_images/dhx_icons/icon_grid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) |[![icon](/tutorial_images/dhx_icons/icon_list.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html)|[![icon](/tutorial_images/dhx_icons/icon_treegrid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) |[![icon](/tutorial_images/dhx_icons/icon_treeview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) 
+
+### Form-oriented Components 
+
+| [Calendar](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)| [ColorPicker](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html) | [Combo](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) | [Editor](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html) | [Form](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) | [Slider](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) 
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_calendar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)|[![icon](/tutorial_images/dhx_icons/icon_colorpicker.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html)|[![icon](/tutorial_images/dhx_icons/icon_combo.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) |[![icon](/tutorial_images/dhx_icons/icon_editor.png)](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html)|[![icon](/tutorial_images/dhx_icons/icon_form.png)](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) |[![icon](/tutorial_images/dhx_icons/icon_slider.png)](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) |
+
+### Navigation Components
+
+| [Menu](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)| [Ribbon](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html) | [Sidebar](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) | [Toolbar](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html) |
+|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_menu.png)](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)|[![icon](/tutorial_images/dhx_icons/icon_ribbon.png)](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html)|[![icon](/tutorial_images/dhx_icons/icon_sidebar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) |[![icon](/tutorial_images/dhx_icons/icon_toolbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html)
+
+## Markdown
+
+- [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+
 
 ## Create a branch
 

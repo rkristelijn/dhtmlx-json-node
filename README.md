@@ -8,6 +8,10 @@ In this tutorial I consider: less is more, if we can use defaults, we should do 
   - [x] Create static html page in Node
   - [x] Get dhx up and running
   - [ ] Initialize the layout, grid and form with static data
+    - [ ] Improve code
+      - [ ] Fix xml to json
+      - [ ] Remove statics from code, remove globals
+      - [ ] ...
   - [ ] Create and connect REST API
 
 # Step 1: Static node web server
@@ -260,6 +264,20 @@ dhtmlxEvent(window, "load", appInit);
 Refresh and this is what we get:
 
 ![Screenshot of dhtmlx a sidebar with 4 items and a toolbar with two buttons](/tutorial_images/Screenshot_20180523_135554.png)
+
+Now the demo uses different js files for the 4 options in the menu and this is initialized on start. We combine the file to improve performance to have only one js file downloaded. Also the demo uses Google maps, we just ignore this feature for now as we need API keys in order for it to work. Also we need tons of images, data files etc. We combine this into one app. Next to that we need to remove the loader from the codebase.
+
+All this is done in this branch: [step3](https://github.com/rkristelijn/dhtmlx-json-node/tree/step3)
+
+The application looks now like this, and no console errors.
+
+![Screenshot of dhtmlx with a working grid that changes also the form when you click a record](/tutorial_images/Screenshot_20180528_112120.png)
+
+![Screenshot of dhtmlx with the projects tile opened showing a grid, a graph and detail view](/tutorial_images/Screenshot_20180528_112132.png)
+
+![Screenshot of dhtmlx with the event tile opened, showing tiles of events](/tutorial_images/Screenshot_20180528_112143.png)
+
+![Screenshot of dhtmlx with the settings tile opened showing tiles and a form](/tutorial_images/Screenshot_20180528_112153.png)
 
 # Step 4: Create and connect REST API
 

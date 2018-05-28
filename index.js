@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 
-app.get('/', (req, res) => {
-  // step2: instead of sending a string, we send a file
-  res.sendFile(__dirname + '/index.html');
-});
+const port = 3000;
 
-app.listen(3000, () => {
-  console.log('listening on *:3000');
+app.use('/', express.static(path.join(__dirname, 'public')));
+
+app.listen(port, () => {
+  console.log('listening on *:' + port);
 });

@@ -5,12 +5,12 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way.
 
 # Plan
-  - [x] Create static html page in Node
-  - [x] Get dhx up and running
-  - [ ] Initialize the layout, grid and form with static data
-    - [ ] Improve code
-      - [ ] Fix xml to json
-      - [ ] Remove statics from code, remove globals
+  - [x] Step1: Create static html page in Node
+  - [x] Step2: Get dhx up and running
+  - [x] Step3: Initialize the layout, grid and form with static data
+    - [ ] Step3a: Improve code
+      - [ ] Step3a1: Fix xml to json
+      - [ ] Step3a2: Remove statics from code, remove globals
       - [ ] ...
   - [ ] Create and connect REST API
 

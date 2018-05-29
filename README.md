@@ -291,7 +291,9 @@ pi@raspberry:~/dhtmlx-json-node/public/server $ ls -al
 6475 contacts-fully-beautified.json
 6588 contacts-fully-beautified.xml
 ```
-converting to json saves (6588-4445) 2143 bytes (only if ndjson'ish).
+
+I'm only drawing conclusions on the minified versions, this is an improvement of (5639-4364) is 1275 bytes less (23% smaller). Let alone having to encode binary data using base64. It is the same for JSON, however there is [BSON](http://bsonspec.org)
+
 Steps to convert dhx XML to JSON:
 
 1. use [XML to JSON](http://www.utilities-online.info/xmltojson/) to convert data
@@ -301,7 +303,7 @@ Steps to convert dhx XML to JSON:
 4. replace `"#cdata-section"` with `"value"`
 5. remove `rows` level on top, remove `colums` level in head, rename `row` to `rows` below the header
 
-Now we need to update the callbacks:
+Now we need to update the function calls to 'eat' JSON instead of XML. The weird thing is that every dhx object seems to need a different structure.
 
 ## Old Code:
 
@@ -329,12 +331,15 @@ settingsDataView.load(A.server + "settings.xml?type=" + A.deviceType, function (
 contactsGrid.load(A.server + "contacts.json?type=" + A.deviceType, function () {
   contactsGrid.selectRow(0, true);
 }, "json");
+
 // ... PROJECTS
 projectsGrid.load(A.server + "projects.json?type=" + A.deviceType, function () {
   projectsGrid.selectRow(0, true);
 }, "json");
+
 // ... EVENS
 eventsDataView.load(A.server + "events.json?type=" + A.deviceType, "json");
+
 // ... SETTINGS
 // load the data, somehow a callback doesn't work
 settingsDataView.load(A.server + "settings.json", "json");

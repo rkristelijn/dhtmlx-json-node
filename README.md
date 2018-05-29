@@ -279,9 +279,113 @@ The application looks now like this, and no console errors.
 
 ![Screenshot of dhtmlx with the settings tile opened showing tiles and a form](/tutorial_images/Screenshot_20180528_112153.png)
 
+# Step 3 a: Change XML to JSON
+
+JSON is much more lightweight than XML. 
+
+```bash
+pi@raspberry:~/dhtmlx-json-node/public/server $ ls -al
+4364 contacts-minified.json
+4445 contacts-ndjson.json
+5639 contacts-minified.xml
+6475 contacts-fully-beautified.json
+6588 contacts-fully-beautified.xml
+```
+
+I'm only drawing conclusions on the minified versions, this is an improvement of (5639-4364) is 1275 bytes less (23% smaller). Let alone having to encode binary data using base64. It is the same for JSON, however there is [BSON](http://bsonspec.org)
+
+Steps to convert dhx XML to JSON:
+
+1. use [XML to JSON](http://www.utilities-online.info/xmltojson/) to convert data
+2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"-`
+3. replace `"#text"` with `"value"`
+4. repoace `"cell"` with `"data"`
+4. replace `"#cdata-section"` with `"value"`
+5. remove `rows` level on top, remove `colums` level in head, rename `row` to `rows` below the header
+
+Now we need to update the function calls to 'eat' JSON instead of XML. The weird thing is that every dhx object seems to need a different structure.
+
+## Old Code:
+
+```javascript
+// ... CONTACTS
+contactsGrid.load(A.server + "contacts.xml?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+});
+// ... PROJECTS
+projectsGrid.load(A.server + "projects.xml?type=" + A.deviceType, function () {
+  projectsGrid.selectRow(0, true);
+});
+// ... EVENTS
+eventsDataView.load(A.server + "events.xml?type=" + A.deviceType);
+
+// ... SETTINGS
+settingsDataView.load(A.server + "settings.xml?type=" + A.deviceType, function () {
+  settingsDataView.select("contacts");
+});
+```
+
+## New Code:
+```javascript
+// ... CONTACTS
+contactsGrid.load(A.server + "contacts.json?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+}, "json");
+
+// ... PROJECTS
+projectsGrid.load(A.server + "projects.json?type=" + A.deviceType, function () {
+  projectsGrid.selectRow(0, true);
+}, "json");
+
+// ... EVENS
+eventsDataView.load(A.server + "events.json?type=" + A.deviceType, "json");
+
+// ... SETTINGS
+// load the data, somehow a callback doesn't work
+settingsDataView.load(A.server + "settings.json", "json");
+// fires when the data loading is finished and a component or data is rendered
+settingsDataView.attachEvent("onXLE", function () {
+  settingsDataView.select("contacts");
+});
+```
+
 # Step 4: Create and connect REST API
 
 # References
+
+## DHTMLX
+
+Most important, the [dhtmlx](https://docs.dhtmlx.com/index.html) API refences:
+
+
+### Layout 
+
+|[Accordion](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)| [Carousel](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html) | [Layout](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) | [Popup](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html) | [Tabbar](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) | [Windows](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_accordion.png)](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)|[![icon](/tutorial_images/dhx_icons/icon_carousel.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html)|[![icon](/tutorial_images/dhx_icons/icon_layout.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) |[![icon](/tutorial_images/dhx_icons/icon_popup.png)](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html)|[![icon](/tutorial_images/dhx_icons/icon_tabbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) |[![icon](/tutorial_images/dhx_icons/icon_windows.png)](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) 
+
+### Data Components 
+
+|[Chart](https://docs.dhtmlx.com/api__refs__dhtmlchart.html)| [DataView](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html) | [Grid](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) | [List](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html) | [TreeGrid](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) | [TreeView](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_chart.png)](https://docs.dhtmlx.com/api__refs__dhtmlxchart.html)|[![icon](/tutorial_images/dhx_icons/icon_dataview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html)|[![icon](/tutorial_images/dhx_icons/icon_grid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) |[![icon](/tutorial_images/dhx_icons/icon_list.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html)|[![icon](/tutorial_images/dhx_icons/icon_treegrid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) |[![icon](/tutorial_images/dhx_icons/icon_treeview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) 
+
+### Form-oriented Components 
+
+| [Calendar](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)| [ColorPicker](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html) | [Combo](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) | [Editor](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html) | [Form](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) | [Slider](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) 
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_calendar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)|[![icon](/tutorial_images/dhx_icons/icon_colorpicker.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html)|[![icon](/tutorial_images/dhx_icons/icon_combo.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) |[![icon](/tutorial_images/dhx_icons/icon_editor.png)](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html)|[![icon](/tutorial_images/dhx_icons/icon_form.png)](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) |[![icon](/tutorial_images/dhx_icons/icon_slider.png)](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) |
+
+### Navigation Components
+
+| [Menu](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)| [Ribbon](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html) | [Sidebar](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) | [Toolbar](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html) |
+|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_menu.png)](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)|[![icon](/tutorial_images/dhx_icons/icon_ribbon.png)](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html)|[![icon](/tutorial_images/dhx_icons/icon_sidebar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) |[![icon](/tutorial_images/dhx_icons/icon_toolbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html)
+
+## Markdown
+
+- [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+
 
 ## Create a branch
 

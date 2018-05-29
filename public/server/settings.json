@@ -1,0 +1,49 @@
+[{
+    "id": "contacts",
+    "image": "contacts.png",
+    "title": "Contacts",
+    "descr": "Manage contacts; set custom settings"
+  },
+  {
+    "id": "events",
+    "image": "events.png",
+    "title": "Events",
+    "descr": "Manage events; set custom settings"
+  },
+  {
+    "id": "projects",
+    "image": "projects.png",
+    "title": "Projects",
+    "descr": "Manage projects; set custom settings"
+  },
+  {
+    "id": "configuration",
+    "image": "configuration.png",
+    "title": "Configuration",
+    "descr": "General settings of your account"
+  },
+  {
+    "id": "exportprint",
+    "image": "export.png",
+    "title": "Export to PDF / Print",
+    "descr": "Print contacts, projects, events, etc."
+  },
+  {
+    "id": "notifications",
+    "image": "notifications.png",
+    "title": "Notifications",
+    "descr": "Set notifications to email, mobile phone, etc."
+  },
+  {
+    "id": "statistics",
+    "image": "statistics.png",
+    "title": "Statistics",
+    "descr": "Check your progress and other stats"
+  },
+  {
+    "id": "removeworkspace",
+    "image": "remove-your-workspace.png",
+    "title": "Remove your workspace",
+    "descr": "Think twice"
+  }
+]

@@ -9,9 +9,11 @@ In this tutorial I consider: less is more, if we can use defaults, we should do 
   - [x] Step2: Get dhx up and running
   - [x] Step3: Initialize the layout, grid and form with static data
     - [ ] Step3a: Improve code
-      - [ ] Step3a1: Fix xml to json
-      - [ ] Step3a2: Remove statics from code, remove globals
-      - [ ] ...
+      - [x] Step3a1: Fix xml to json
+      - [ ] Step3ax: Remove statics from code
+    - [ ] Step3b: remove globals
+    - [ ] Step3c: Use streamable technology
+    - [ ] Step3d: ...
   - [ ] Create and connect REST API
 
 # Step 1: Static node web server

@@ -283,6 +283,24 @@ The application looks now like this, and no console errors.
 
 JSON is much more lightweight than XML. 
 
+```bash
+pi@raspberry:~/dhtmlx-json-node/public/server $ ls -al
+4364 contacts-minified.json
+4445 contacts-ndjson.json
+5639 contacts-minified.xml
+6475 contacts-fully-beautified.json
+6588 contacts-fully-beautified.xml
+```
+converting to json saves (6588-4445) 2143 bytes (only if ndjson'ish).
+Steps to convert dhx XML to JSON:
+
+1. use [XML to JSON](http://www.utilities-online.info/xmltojson/) to convert data
+2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"-`
+3. replace `"#text"` with `"value"`
+4. repoace `"cell"` with `"data"`
+4. replace `"#cdata-section"` with `"value"`
+5. remove `rows` level on top, remove `colums` level in head, rename `row` to `rows` below the header
+
 # Step 4: Create and connect REST API
 
 # References

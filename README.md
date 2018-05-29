@@ -306,6 +306,42 @@ Now we need to update the callbacks:
 ## Old Code:
 
 ```javascript
+// ... CONTACTS
+contactsGrid.load(A.server + "contacts.xml?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+});
+// ... PROJECTS
+projectsGrid.load(A.server + "projects.xml?type=" + A.deviceType, function () {
+  projectsGrid.selectRow(0, true);
+});
+// ... EVENTS
+eventsDataView.load(A.server + "events.xml?type=" + A.deviceType);
+
+// ... SETTINGS
+settingsDataView.load(A.server + "settings.xml?type=" + A.deviceType, function () {
+  settingsDataView.select("contacts");
+});
+```
+
+## New Code:
+```javascript
+// ... CONTACTS
+contactsGrid.load(A.server + "contacts.json?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+}, "json");
+// ... PROJECTS
+projectsGrid.load(A.server + "projects.json?type=" + A.deviceType, function () {
+  projectsGrid.selectRow(0, true);
+}, "json");
+// ... EVENS
+eventsDataView.load(A.server + "events.json?type=" + A.deviceType, "json");
+// ... SETTINGS
+// load the data, somehow a callback doesn't work
+settingsDataView.load(A.server + "settings.json", "json");
+// fires when the data loading is finished and a component or data is rendered
+settingsDataView.attachEvent("onXLE", function () {
+  settingsDataView.select("contacts");
+});
 ```
 
 # Step 4: Create and connect REST API

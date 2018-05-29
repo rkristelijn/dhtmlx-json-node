@@ -274,8 +274,6 @@ function eventsInit(cell) {
     });
 
     eventsDataView.load(A.server + "events.json?type=" + A.deviceType, "json");
-    eventsDataView.attachEvent("onAfterSelect", function (id) {
-    });
   }
 }
 

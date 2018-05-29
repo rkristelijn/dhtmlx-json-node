@@ -301,6 +301,13 @@ Steps to convert dhx XML to JSON:
 4. replace `"#cdata-section"` with `"value"`
 5. remove `rows` level on top, remove `colums` level in head, rename `row` to `rows` below the header
 
+Now we need to update the callbacks:
+
+## Old Code:
+
+```javascript
+```
+
 # Step 4: Create and connect REST API
 
 # References

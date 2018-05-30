@@ -16,7 +16,12 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Remove globals
     - [ ] Use streamable technology (fetch?)
     - [ ] Write some tests
-  - [ ] Create and connect REST API
+  - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
+    - [ ] get uses statics
+    - [ ] get uses data from db
+    - [ ] put for updates
+    - [ ] post for create
+    - [ ] delete for delete
 
   - [References](#references)
 
@@ -370,6 +375,12 @@ settingsDataView.attachEvent("onXLE", function () {
 ```
 
 # Step 4: Create and connect REST API
+
+[back to top](#plan)
+
+[@see branch Step4](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4)
+
+The first thing we need to do is create a router set for every element
 
 # References
 

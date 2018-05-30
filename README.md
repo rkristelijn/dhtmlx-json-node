@@ -17,8 +17,8 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Use streamable technology (fetch?)
     - [ ] Write some tests
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
-    - [ ] get uses statics
-    - [ ] get uses data from db
+    - [ ] get using statics
+    - [ ] get using data from db
     - [ ] put for updates
     - [ ] post for create
     - [ ] delete for delete
@@ -380,7 +380,115 @@ settingsDataView.attachEvent("onXLE", function () {
 
 [@see branch Step4](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4)
 
-The first thing we need to do is create a router set for every element
+## Step 4a: set up get for contacts with a static file
+
+The first thing we need to do is create a router set for every element.
+
+`index.js`
+```javascript
+const express = require('express');
+const app = express();
+const path = require('path');
+
+const port = 3000;
+
+app.use('/', express.static(path.join(__dirname, 'public')));
+
+/// /* step 4
+const apiRouter = require('./api/api-router')();
+app.use('/api', apiRouter);
+/// step 4 */
+
+app.listen(port, () => {
+  console.log('listening on *:' + port);
+});
+```
+
+Then we create a new file and put some [HATEOAS](https://spring.io/understanding/HATEOAS) in.
+
+`api\api-router.js`
+```javascript
+const express = require('express');
+
+let routes = () => {
+  let apiRouter = express.Router();
+
+  apiRouter.get('/', (req, res) => {
+    res.json({
+      contacts: { links: `${req.protocol}://${req.headers.host}/api/contacts` }
+    });
+  });
+
+  return apiRouter;
+}
+
+module.exports = routes;
+```
+
+Now we have this:
+
+![Screenshot of json HATEOAS](/tutorial_images/Screenshot_20180530_105324.png)
+
+I use [JSON viewer](https://github.com/tulios/json-viewer) to beautify.
+
+Then we add an API for the contacts. Therefore we need to 
+- move `/public/server/contacts.json` to `/api/contacts/contacts.json`
+
+Add `api/contact/contacts-router.js`
+
+```javascript
+const express = require('express');
+
+let routes = () => {
+  let contactsRouter = express.Router();
+
+  contactsRouter.get('/', (req, res) => {
+    res.sendFile(__dirname + '/contacts.json');
+  });
+
+  return contactsRouter;
+}
+
+module.exports = routes;
+```
+And update `/api/api-router.js`
+
+```javascript
+const express = require('express');
+const contactsRouter = require('./contacts/contacts-router')(); // add this line
+
+let routes = () => {
+  let apiRouter = express.Router();
+
+  apiRouter.use('/contacts', contactsRouter); // add this line
+
+  apiRouter.get('/', (req, res) => {
+    res.json({
+      contacts: { links: `${req.protocol}://${req.headers.host}/api/contacts` }
+    });
+  });
+
+  return apiRouter;
+}
+
+module.exports = routes;
+```
+Finally we need tell the front-end that the entrypoint for getting contacts is moved.
+
+`public/app.js`
+
+```javascript
+contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+}, "json");
+```
+The result:
+
+![Screenshot of json HATEOAS](/tutorial_images/Screenshot_20180530_112121.png)
+
+## Step 4b: set up get for projects with a static file
+
+[back to top](#plan)
 
 # References
 
@@ -388,8 +496,7 @@ The first thing we need to do is create a router set for every element
 
 ## DHTMLX
 
-Most important, the [dhtmlx](https://docs.dhtmlx.com/index.html) API refences:
-
+Most important, the [dhtmlx](https://docs.dhtmlx.com/index.html) API references:
 
 ### Layout 
 

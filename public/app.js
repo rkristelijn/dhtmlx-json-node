@@ -119,7 +119,7 @@ function contactsInit(cell) {
 
     // attach grid
     contactsGrid = contactsLayout.cells("a").attachGrid();
-    contactsGrid.load(A.server + "contacts.json?type=" + A.deviceType, function () {
+    contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
       contactsGrid.selectRow(0, true);
     }, "json");
 

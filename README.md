@@ -5,18 +5,22 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way.
 
 # Plan
-  - [x] Step1: Create static html page in Node
-  - [x] Step2: Get dhx up and running
-  - [x] Step3: Initialize the layout, grid and form with static data
+  - [x] [Step1: Create static html page in Node](#step-1-static-node-web-server)
+  - [x] [Step2: Get dhx up and running](#step-2-get-dhx-up-and-running)
+  - [x] [Step3: Initialize the layout, grid and form with static data](#step-3-initialize-the-layout-grid-and-form-with-static-data)
     - [ ] Step3a: Improve code
-      - [x] Step3a1: Fix xml to json
+      - [x] [Step3a1: Fix xml to json](#step-3-a-change-xml-to-json)
       - [ ] Step3ax: Remove statics from code
-    - [ ] Step3b: remove globals
-    - [ ] Step3c: Use streamable technology
-    - [ ] Step3d: ...
+    - [ ] Remove globals
+    - [ ] Use streamable technology (fetch?)
+    - [ ] Write some tests
   - [ ] Create and connect REST API
 
+  - [References](#references)
+
 # Step 1: Static node web server
+
+[back to top](#plan)
 
 Use npm to create a new `package.json` file:
 
@@ -59,6 +63,8 @@ That is all you need to create a simple node app. You can either use `node .` to
 Let's save our work using `git add.`, `git commit -a -m "blablabla"` and `git push`
 
 # Step 2: Get dhx up and running
+
+[back to top](#plan)
 
 Instead of sending a string, we will send a static html page.
 
@@ -106,6 +112,8 @@ Restart your node application and enjoy the majesty.
 ![Screenshot of dhtmlx with only a modal dialogue saying hello world](/tutorial_images/Screenshot_20180523_102030.png)
 
 # Step 3: Initialize the layout, grid and form with static data
+
+[back to top](#plan)
 
 Best practices is to not mix html, javascript, css, etc together, so in this case, we are writing our dhtmlx app inline of index.html. Let's fix that. Before we do that, we need to create folder that is able to load our static files. We call this folder `public`.
 
@@ -281,7 +289,9 @@ The application looks now like this, and no console errors.
 
 ![Screenshot of dhtmlx with the settings tile opened showing tiles and a form](/tutorial_images/Screenshot_20180528_112153.png)
 
-# Step 3 a: Change XML to JSON
+## Step 3 a: Change XML to JSON
+
+[back to top](#plan)
 
 JSON is much more lightweight than XML. 
 
@@ -354,6 +364,8 @@ settingsDataView.attachEvent("onXLE", function () {
 # Step 4: Create and connect REST API
 
 # References
+
+[back to top](#plan)
 
 ## DHTMLX
 

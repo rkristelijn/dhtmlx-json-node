@@ -17,7 +17,7 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Use streamable technology (fetch?)
     - [ ] Write some tests
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
-    - [ ] get using statics
+    - [x] get using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [ ] get using data from db
     - [ ] put for updates
     - [ ] post for create
@@ -489,6 +489,71 @@ The result:
 ## Step 4b: set up get for projects with a static file
 
 [back to top](#plan)
+
+Same as for contacts;
+
+- we create a folder in `api` called `projects`, 
+- move the file `public/server/projects.json` to `api/projects`
+- create a new file `api/projects/projects-router.js`
+- add the route to `api/api-router.js`
+- point the load event to `/api/projects`
+
+`api/projects/projects-router.js`
+
+```javascript
+const express = require('express');
+
+let routes = () => {
+  let projectsRouter = express.Router();
+
+  projectsRouter.get('/', (req, res) => {
+    res.sendFile(__dirname + '/projects.json');
+  });
+
+  return projectsRouter;
+}
+
+module.exports = routes;
+```
+
+`api/api-router.js`
+
+```javascript
+const express = require('express');
+const contactsRouter = require('./contacts/contacts-router')();
+const projectsRouter = require('./projects/projects-router')(); // add this line
+
+let routes = () => {
+  let apiRouter = express.Router();
+
+  apiRouter.use('/contacts', contactsRouter);
+  apiRouter.use('/projects', projectsRouter); // add this line
+
+  apiRouter.get('/', (req, res) => {
+    res.json({
+      contacts: { links: `${req.protocol}://${req.headers.host}/api/contacts` },
+      projects: { links: `${req.protocol}://${req.headers.host}/api/projects` }  // add this line
+    });
+  });
+
+  return apiRouter;
+}
+
+module.exports = routes;
+```
+
+`public/app.js`
+
+```javascript
+projectsGrid.load("api/projects?type=" + A.deviceType, function () {
+  projectsGrid.selectRow(0, true);
+}, "json");
+```
+## Step 4c: events and settings
+
+[back to top](#plan)
+
+Repeat the process of projects [step4b](#step-4b-set-up-get-for-projects-with-a-static-file) for 
 
 # References
 

@@ -2,7 +2,13 @@
 
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
-In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way.
+## Prerequisites:
+
+1. latest node and npm
+2. mongodb server up and running
+3. up-to-date javascript, git, bash and mongodb skills
+
+In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way. I think it is better to learn things the right way and later discover; 'hey... there is also a old or wrong way'. 
 
 This tutorial follows my development step by step using git branches. Every chapter contains a link to the feature branch.
 
@@ -17,11 +23,11 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Use streamable technology (fetch?)
     - [ ] Write some tests
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
-    - [x] get using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
-    - [ ] get using data from db
-    - [ ] put for updates
-    - [ ] post for create
-    - [ ] delete for delete
+    - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
+    - [ ] [GET using data from db](#step-4d-get-using-data-from-db)
+    - [ ] PUT for updates
+    - [ ] POST for create
+    - [ ] DELETE for delete
 
   - [References](#references)
 
@@ -29,7 +35,7 @@ This tutorial follows my development step by step using git branches. Every chap
 
 [back to top](#plan)
 
-[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step1))
+[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step1)
 
 Use npm to create a new `package.json` file:
 
@@ -322,7 +328,7 @@ I'm only drawing conclusions on the minified versions, this is an improvement of
 Steps to convert dhx XML to JSON:
 
 1. use [XML to JSON](http://www.utilities-online.info/xmltojson/) to convert data
-2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"-`
+2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"`
 3. replace `"#text"` with `"value"`
 4. repoace `"cell"` with `"data"`
 4. replace `"#cdata-section"` with `"value"`
@@ -380,7 +386,7 @@ settingsDataView.attachEvent("onXLE", function () {
 
 [@see branch Step4](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4)
 
-## Step 4a: set up get for contacts with a static file
+## Step 4a: set up GET for contacts with a static file
 
 The first thing we need to do is create a router set for every element.
 
@@ -486,7 +492,7 @@ The result:
 
 ![Screenshot of json HATEOAS](/tutorial_images/Screenshot_20180530_112121.png)
 
-## Step 4b: set up get for projects with a static file
+## Step 4b: set up GET for projects with a static file
 
 [back to top](#plan)
 
@@ -553,7 +559,112 @@ projectsGrid.load("api/projects?type=" + A.deviceType, function () {
 
 [back to top](#plan)
 
-Repeat the process of projects [step4b](#step-4b-set-up-get-for-projects-with-a-static-file) for 
+Repeat the process of projects [step4b](#step-4b-set-up-get-for-projects-with-a-static-file) for events and contacts.
+
+## Step 4d: GET using data from db
+
+For setting up a connection to the database, we need [`mongoose`](http://mongoosejs.com/).
+
+`npm i --save mongoose`
+
+Update `index.js`, add:
+
+```javascript
+//...
+const mongoose = require('mongoose');
+//...
+mongoose.connect('mongodb://localhost/cms');
+mongoose.set('debug', true);
+let db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'Mongoose:'));
+db.once('open', () => {
+  console.log('Connected to mongoose');
+});
+//...
+```
+
+If you now start your app:
+
+```bash
+[nodemon] starting `node ./index.js`
+listening on *:3000
+Connected to mongoose
+```
+
+(Hands in the air and say: Huray!)
+
+Now we are going to create some data. We do this only once and we (mis)use the spec file for this. Later on I may want to write test. Yeah I know, test-drive development... I bother about test later, and maybe I'll start a new tutor where I first write my tests.
+
+So first, let there be a Schema:
+
+`api/contacts/contacts-model.js`
+```javascript
+const mongoose = require('mongoose');
+
+const ContactsSchema = mongoose.Schema({
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  photo: String,
+  name: String,
+  dob: Date,
+  pos: String,
+  email: String,
+  phone: String,
+  company: String,
+  info: String
+});
+
+const Contact = mongoose.model('Contact', ContactsSchema);
+
+module.exports = Contact;
+```
+
+Then create a small file to just insert one contact:
+
+`api/contacts/contacts-model.spec.js`
+
+```javascript
+const mongoose = require('mongoose');
+const Contact = require('./contacts-model');
+
+mongoose.connect('mongodb://localhost/cms');
+mongoose.set('debug', true);
+let db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'Mongoose:'));
+db.once('open', () => {
+  console.log('Connected to mongoose');
+});
+
+contact = new Contact({
+  photo: "<img src=\"imgs/contacts/small/margaret-black.jpg\" border=\"0\" class=\"contact_photo\">",
+  name: "Margaret Black",
+  dob: "9/1/1985",
+  pos: "CEO",
+  email: "mblack_ceo@mail.com",
+  phone: "1-805-287-4750",
+  info: "M Black Ltd"
+});
+
+contact.save(err => {
+  if (err) {
+    console.log('error', err);
+  }
+});
+```
+
+And now let's try it;
+
+```bash
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ node contacts-model.spec.js 
+Connected to mongoose
+Mongoose: contacts.insertOne({ _id: ObjectId("5b0ea66a948a28613642d50f"), photo: '<img src="imgs/contacts/small/margaret-black.jpg" border="0" class="contact_photo">', name: 'Margaret Black', dob: new Date("Sat, 31 Aug 1985 22:00:00 GMT"), pos: 'CEO', email: 'mblack_ceo@mail.com', phone: '1-805-287-4750', info: 'M Black Ltd', created: new Date("Wed, 30 May 2018 13:26:02 GMT"), __v: 0 })
+```
+
+The only thing we need to do now is read the contacts.json file, loop though the data and create all contacts.
 
 # References
 

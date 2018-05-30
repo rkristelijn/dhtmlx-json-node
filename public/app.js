@@ -119,7 +119,7 @@ function contactsInit(cell) {
 
     // attach grid
     contactsGrid = contactsLayout.cells("a").attachGrid();
-    contactsGrid.load(A.server + "contacts.json?type=" + A.deviceType, function () {
+    contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
       contactsGrid.selectRow(0, true);
     }, "json");
 
@@ -164,7 +164,7 @@ function projectsInit(cell) {
 
     // attach grid
     projectsGrid = projectsLayout.cells("a").attachGrid();
-    projectsGrid.load(A.server + "projects.json?type=" + A.deviceType, function () {
+    projectsGrid.load("api/projects?type=" + A.deviceType, function () {
       projectsGrid.selectRow(0, true);
     }, "json");
     projectsGrid.attachEvent("onRowSelect", projectsFillForm);
@@ -272,7 +272,7 @@ function eventsInit(cell) {
       edit: false
     });
 
-    eventsDataView.load(A.server + "events.json?type=" + A.deviceType, "json");
+    eventsDataView.load("api/events?type=" + A.deviceType, "json");
   }
 }
 
@@ -327,7 +327,7 @@ function settingsInit(cell) {
     });
 
     // load the data, somehow a callback doesn't work
-    settingsDataView.load(A.server + "settings.json", "json");
+    settingsDataView.load("/api/settings", "json");
 
     // fires when the data loading is finished and a component or data is rendered
     settingsDataView.attachEvent("onXLE", function () {

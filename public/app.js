@@ -55,7 +55,6 @@ if (typeof (window.addEventListener) == "function") {
 }
 
 //// # THE MAIN LAYOUT
-
 var mainSidebar;
 var mainToolbar;
 

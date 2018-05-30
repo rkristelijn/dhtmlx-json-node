@@ -4,6 +4,8 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 
 In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way.
 
+This tutorial follows my development step by step using git branches. Every chapter contains a link to the feature branch.
+
 # Plan
   - [x] [Step1: Create static html page in Node](#step-1-static-node-web-server)
   - [x] [Step2: Get dhx up and running](#step-2-get-dhx-up-and-running)
@@ -21,6 +23,8 @@ In this tutorial I consider: less is more, if we can use defaults, we should do 
 # Step 1: Static node web server
 
 [back to top](#plan)
+
+[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step1))
 
 Use npm to create a new `package.json` file:
 
@@ -65,6 +69,8 @@ Let's save our work using `git add.`, `git commit -a -m "blablabla"` and `git pu
 # Step 2: Get dhx up and running
 
 [back to top](#plan)
+
+[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step2))
 
 Instead of sending a string, we will send a static html page.
 
@@ -114,6 +120,8 @@ Restart your node application and enjoy the majesty.
 # Step 3: Initialize the layout, grid and form with static data
 
 [back to top](#plan)
+
+[@see branch step 3](https://github.com/rkristelijn/dhtmlx-json-node/tree/step3))
 
 Best practices is to not mix html, javascript, css, etc together, so in this case, we are writing our dhtmlx app inline of index.html. Let's fix that. Before we do that, we need to create folder that is able to load our static files. We call this folder `public`.
 
@@ -277,8 +285,6 @@ Refresh and this is what we get:
 
 Now the demo uses different js files for the 4 options in the menu and this is initialized on start. We combine the file to improve performance to have only one js file downloaded. Also the demo uses Google maps, we just ignore this feature for now as we need API keys in order for it to work. Also we need tons of images, data files etc. We combine this into one app. Next to that we need to remove the loader from the codebase.
 
-All this is done in this branch: [step3](https://github.com/rkristelijn/dhtmlx-json-node/tree/step3)
-
 The application looks now like this, and no console errors.
 
 ![Screenshot of dhtmlx with a working grid that changes also the form when you click a record](/tutorial_images/Screenshot_20180528_112120.png)
@@ -292,6 +298,8 @@ The application looks now like this, and no console errors.
 ## Step 3 a: Change XML to JSON
 
 [back to top](#plan)
+
+[@see branch Step3a1](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step3a1)
 
 JSON is much more lightweight than XML. 
 

@@ -27,7 +27,7 @@ This tutorial follows my development step by step using git branches. Every chap
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
-    - [ ] PUT for updates
+    - [ ] [PUT for updates](#step-4e-put-for-updates)
     - [ ] POST for create
     - [ ] DELETE for delete
 

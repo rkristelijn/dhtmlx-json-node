@@ -2,7 +2,15 @@
 
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
-In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way.
+## Prerequisites:
+
+1. latest node and npm
+2. mongodb server up and running
+3. up-to-date javascript, git, bash and mongodb skills
+
+You could have a look at setting up such an environment on either a [physical raspberry pi](https://www.linkedin.com/pulse/develop-full-stack-javascript-applications-using-only-remi-kristelijn/) or a [virtual raspberry pi](https://www.linkedin.com/pulse/my-perfect-javascript-developer-set-up-remi-kristelijn/).
+
+In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way. I think it is better to learn things the right way and later discover; 'hey... there is also a old or wrong way'. 
 
 This tutorial follows my development step by step using git branches. Every chapter contains a link to the feature branch.
 
@@ -17,11 +25,11 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Use streamable technology (fetch?)
     - [ ] Write some tests
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
-    - [x] get using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
-    - [ ] get using data from db
-    - [ ] put for updates
-    - [ ] post for create
-    - [ ] delete for delete
+    - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
+    - [x] [GET using data from db](#step-4d-get-using-data-from-db)
+    - [ ] PUT for updates
+    - [ ] POST for create
+    - [ ] DELETE for delete
 
   - [References](#references)
 
@@ -29,7 +37,7 @@ This tutorial follows my development step by step using git branches. Every chap
 
 [back to top](#plan)
 
-[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step1))
+[@see branch step 2](https://github.com/rkristelijn/dhtmlx-json-node/tree/step1)
 
 Use npm to create a new `package.json` file:
 
@@ -322,7 +330,7 @@ I'm only drawing conclusions on the minified versions, this is an improvement of
 Steps to convert dhx XML to JSON:
 
 1. use [XML to JSON](http://www.utilities-online.info/xmltojson/) to convert data
-2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"-`
+2. replace `"-width"` with `"width"`, same for `id`, `type`, `align`, `sort` -> by replacing `"-` for `"`
 3. replace `"#text"` with `"value"`
 4. repoace `"cell"` with `"data"`
 4. replace `"#cdata-section"` with `"value"`
@@ -380,7 +388,7 @@ settingsDataView.attachEvent("onXLE", function () {
 
 [@see branch Step4](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4)
 
-## Step 4a: set up get for contacts with a static file
+## Step 4a: set up GET for contacts with a static file
 
 The first thing we need to do is create a router set for every element.
 
@@ -486,7 +494,7 @@ The result:
 
 ![Screenshot of json HATEOAS](/tutorial_images/Screenshot_20180530_112121.png)
 
-## Step 4b: set up get for projects with a static file
+## Step 4b: set up GET for projects with a static file
 
 [back to top](#plan)
 
@@ -553,7 +561,330 @@ projectsGrid.load("api/projects?type=" + A.deviceType, function () {
 
 [back to top](#plan)
 
-Repeat the process of projects [step4b](#step-4b-set-up-get-for-projects-with-a-static-file) for 
+Repeat the process of projects [step4b](#step-4b-set-up-get-for-projects-with-a-static-file) for events and contacts.
+
+## Step 4d: GET using data from db
+
+For setting up a connection to the database, we need [`mongoose`](http://mongoosejs.com/).
+
+`npm i --save mongoose`
+
+Update `index.js`, add:
+
+```javascript
+//...
+const mongoose = require('mongoose');
+//...
+mongoose.connect('mongodb://localhost/cms');
+mongoose.set('debug', true);
+let db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'Mongoose:'));
+db.once('open', () => {
+  console.log('Connected to mongoose');
+});
+//...
+```
+
+If you now start your app:
+
+```bash
+[nodemon] starting `node ./index.js`
+listening on *:3000
+Connected to mongoose
+```
+
+(Hands in the air and say: Huray!)
+
+Now we are going to create some data. We do this only once and we (mis)use the spec file for this. Later on I may want to write test. Yeah I know, test-drive development... I bother about test later, and maybe I'll start a new tutor where I first write my tests.
+
+So first, let there be a Schema:
+
+`api/contacts/contacts-model.js`
+```javascript
+const mongoose = require('mongoose');
+
+const ContactsSchema = mongoose.Schema({
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  photo: String,
+  name: String,
+  dob: Date,
+  pos: String,
+  email: String,
+  phone: String,
+  company: String,
+  info: String
+});
+
+const Contact = mongoose.model('Contact', ContactsSchema);
+
+module.exports = Contact;
+```
+
+Then create a small file to just insert one contact:
+
+`api/contacts/contacts-model.spec.js`
+
+```javascript
+const mongoose = require('mongoose');
+const Contact = require('./contacts-model');
+
+mongoose.connect('mongodb://localhost/cms');
+mongoose.set('debug', true);
+let db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'Mongoose:'));
+db.once('open', () => {
+  console.log('Connected to mongoose');
+});
+
+contact = new Contact({
+  photo: "<img src=\"imgs/contacts/small/margaret-black.jpg\" border=\"0\" class=\"contact_photo\">",
+  name: "Margaret Black",
+  dob: "9/1/1985",
+  pos: "CEO",
+  email: "mblack_ceo@mail.com",
+  phone: "1-805-287-4750",
+  info: "M Black Ltd"
+});
+
+contact.save(err => {
+  if (err) {
+    console.log('error', err);
+  }
+});
+```
+
+And now let's try it;
+
+```bash
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ node contacts-model.spec.js 
+Connected to mongoose
+Mongoose: contacts.insertOne({ _id: ObjectId("5b0ea66a948a28613642d50f"), photo: '<img src="imgs/contacts/small/margaret-black.jpg" border="0" class="contact_photo">', name: 'Margaret Black', dob: new Date("Sat, 31 Aug 1985 22:00:00 GMT"), pos: 'CEO', email: 'mblack_ceo@mail.com', phone: '1-805-287-4750', info: 'M Black Ltd', created: new Date("Wed, 30 May 2018 13:26:02 GMT"), __v: 0 })
+```
+
+The only thing we need to do now is read the contacts.json file, loop though the data and create all contacts.
+
+`contacts-model.spec.js`
+
+```javascript
+const mongoose = require('mongoose');
+const Contact = require('./contacts-model');
+const fs = require('fs');
+
+mongoose.connect('mongodb://localhost/cms');
+mongoose.set('debug', true);
+let db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'Mongoose:'));
+db.once('open', () => {
+  console.log('Connected to mongoose');
+});
+
+fs.readFile('./contacts.json', (err, data) => {
+  if (err) console.log('error', err);
+  obj = JSON.parse(data);
+  for (contact of obj.rows) {
+    console.log(`Creating ${contact.data[1]}...`);
+    contact = new Contact({
+      photo: contact.data[0],
+      name: contact.data[1],
+      dob: contact.data[2],
+      pos: contact.data[3],
+      email: contact.data[4],
+      phone: contact.data[5],
+      company: contact.data[6],
+      info: contact.data[7]
+    });
+
+    contact.save(err => {
+      if (err) {
+        console.log('error', err);
+      }
+    });
+  }
+});
+
+
+```
+Let's run it: `node contacts-model.spec.js` but first, empty the table to make sure all data is clean
+
+```bash
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ mongo
+MongoDB shell version: 3.2.11
+connecting to: test
+Server has startup warnings: 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] ** WARNING: This 32-bit MongoDB binary is deprecated
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] ** NOTE: This is a 32 bit MongoDB binary.
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] **       32 bit builds are limited to less than 2GB of data (or less with --journal).
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] **       See http://dochub.mongodb.org/core/32bit
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+> use cms
+switched to db cms
+> db.contacts.remove({})
+WriteResult({ "nRemoved" : 17 })
+> exit
+bye
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ node contacts-model.spec.js 
+Creating Margaret Black...
+Creating John Woken...
+Creating Jake Peterson...
+Creating Bill Jackson...
+Creating Jennifer Miles...
+Creating Cortny Barrens...
+Creating Edward Eden...
+Creating Andrew Scott...
+Creating Steve Anderson...
+Creating Jane Wilson...
+Creating Alan Robbinson...
+Creating William Parson...
+Creating Charlotte Wolks...
+Creating Pamela Worner...
+Creating Ralf Ross...
+Creating Dan Witley...
+Creating Anna Harrison...
+Connected to mongoose
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf1"), photo: '<img src="imgs/contacts/small/margaret-black.jpg" border="0" class="contact_photo">', name: 'Margaret Black', dob: '9/1/1985', pos: 'CEO', email: 'mblack_ceo@mail.com', phone: '1-805-287-4750', company: 'M Black Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf2"), photo: '<img src="imgs/contacts/small/john-woken.jpg" border="0" class="contact_photo">', name: 'John Woken', dob: '3/24/1987', pos: 'Business analyst', email: 'john.woken@mail.com', phone: '1-867-777-9834', company: 'M-Black Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf3"), photo: '<img src="imgs/contacts/small/jake-peterson.jpg" border="0" class="contact_photo">', name: 'Jake Peterson', dob: '11/27/1982', pos: 'Accountant', email: 'jake.peterson@mail.com', phone: '1-845-257-9751', company: 'Jackson and partners Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf4"), photo: '<img src="imgs/contacts/small/bill-jackson.jpg" border="0" class="contact_photo">', name: 'Bill Jackson', dob: '5/3/1980', pos: 'Web developer', email: 'Bill.Jackson@mail.com', phone: '1-874-548-9751', company: 'BFG Consulting Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf5"), photo: '<img src="imgs/contacts/small/jennifer-miles.jpg" border="0" class="contact_photo">', name: 'Jennifer Miles', dob: '4/17/1985', pos: 'Project manager', email: 'Jennifer.Miles@mail.com', phone: '1-852-895-9752', company: 'F&M Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf6"), photo: '<img src="imgs/contacts/small/cortny-barrens.jpg" border="0" class="contact_photo">', name: 'Cortny Barrens', dob: '6/20/1979', pos: 'Sales manager', email: 'Cortny.Barrens@mail.com', phone: '1-842-458-1452', company: 'F&M Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf7"), photo: '<img src="imgs/contacts/small/edward-eden.jpg" border="0" class="contact_photo">', name: 'Edward Eden', dob: '1/14/1983', pos: 'Business analyst', email: 'Edward.Eden@mail.com', phone: '1-863-452-4750', company: 'BFG Consulting Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf8"), photo: '<img src="imgs/contacts/small/andrew-scott.jpg" border="0" class="contact_photo">', name: 'Andrew Scott', dob: '2/15/1980', pos: 'HR manager', email: 'Andrew.Scott@mail.com', phone: '1-874-452-4873', company: 'Jackson and partners Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf9"), photo: '<img src="imgs/contacts/small/steve-anderson.jpg" border="0" class="contact_photo">', name: 'Steve Anderson', dob: '4/17/1978', pos: 'Business analyst', email: 'Steve.Anderson@mail.com', phone: '1-863-548-4874', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfa"), photo: '<img src="imgs/contacts/small/jane-wilson.jpg" border="0" class="contact_photo">', name: 'Jane Wilson', dob: '6/25/1980', pos: 'Product manager', email: 'Jane.Wilson@mail.com', phone: '1-863-452-9834', company: 'HDF Insurance', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfb"), photo: '<img src="imgs/contacts/small/alan-robbinson.jpg" border="0" class="contact_photo">', name: 'Alan Robbinson', dob: '8/16/1970', pos: 'Web developer', email: 'Alan.Robbinson@mail.com', phone: '1-863-452-9752', company: 'Meriton Group', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfc"), photo: '<img src="imgs/contacts/small/william-parson.jpg" border="0" class="contact_photo">', name: 'William Parson', dob: '10/2/1969', pos: 'Cheif engineer', email: 'William.Parson@mail.com', phone: '1-874-452-4877', company: 'ANG Learning', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfd"), photo: '<img src="imgs/contacts/small/charlotte-wolks.jpg" border="0" class="contact_photo">', name: 'Charlotte Wolks', dob: '12/4/1989', pos: 'Marketing specialist', email: 'Charlotte.Wolks@mail.com', phone: '1-863-452-4750', company: 'HDF Insurance', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfe"), photo: '<img src="imgs/contacts/small/pamela-worner.jpg" border="0" class="contact_photo">', name: 'Pamela Worner', dob: '11/17/1976', pos: 'Business analyst', email: 'Pamela.Worner@mail.com', phone: '1-863-548-4879', company: 'ANG Learning', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bff"), photo: '<img src="imgs/contacts/small/ralf-ross.jpg" border="0" class="contact_photo">', name: 'Ralf Ross', dob: '9/29/1973', pos: 'Sales manager', email: 'Ralf.Ross@mail.com', phone: '1-863-452-9751', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13c00"), photo: '<img src="imgs/contacts/small/dan-witley.jpg" border="0" class="contact_photo">', name: 'Dan Witley', dob: '1/5/1978', pos: 'Web developer', email: 'Dan.Witley@mail.com', phone: '1-874-452-9834', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13c01"), photo: '<img src="imgs/contacts/small/anna-harrison.jpg" border="0" class="contact_photo">', name: 'Anna Harrison', dob: '5/8/1984', pos: 'QA engineer', email: 'Anna.Harrison@mail.com', phone: '1-863-548-9751', company: 'Meriton Group', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+^C
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ ^C
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ mongo
+MongoDB shell version: 3.2.11
+connecting to: test
+Server has startup warnings: 
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] 
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] ** WARNING: This 32-bit MongoDB binary is deprecated
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] 
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] 
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] ** NOTE: This is a 32 bit MongoDB binary.
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] **       32 bit builds are limited to less than 2GB of data (or less with --journal).
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] **       See http://dochub.mongodb.org/core/32bit
+2018-05-30T14:25:48.215+0200 I CONTROL  [initandlisten] 
+> use cms
+switched to db cms
+> show collections
+contacts
+system.indexes
+> db.contacts.find()
+{ "_id" : ObjectId("5b150f6369957c198ff13bf6"), "photo" : "<img src=\"imgs/contacts/small/cortny-barrens.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Cortny Barrens", "dob" : "6/20/1979", "pos" : "Sales manager", "email" : "Cortny.Barrens@mail.com", "phone" : "1-842-458-1452", "company" : "F&M Ltd", "created" : ISODate("2018-06-04T10:07:31.128Z"), "__v" : 0 }
+ ... 
+Type "it" for more
+> exit
+bye
+
+```
+
+Now that the data is in, let's try and get it via the script.
+
+For this we need a controller:
+
+`api/contacts/contacts-controller.js`
+
+```javascript
+let contactsController = (Model) => {
+  // hardcoded header
+  let _head = [
+    { "id": "photo", "width": "65", "type": "ro", "align": "center", "sort": "na", "value": "<span style='padding-left:60px;'>Name</span>" },
+    { "id": "name", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "#cspan" },
+    { "id": "dob", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Date of Birth" },
+    { "id": "pos", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Position" },
+    { "id": "email", "width": "170", "type": "ro", "align": "left", "sort": "na", "value": "E-mail Address" },
+    { "id": "phone", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Phone" },
+    { "id": "company", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Company" },
+    { "id": "info", "width": "*", "type": "ro", "align": "left", "sort": "na", "value": "Additional" }];
+
+  // just find all data in table
+  let _readAll = (callback) => {
+    Model.find({}, (err, contacts) => {
+      if (err) callback(err, null);
+      else callback(null, { head: _head, rows: _toRows(contacts) });
+    });
+  };
+
+  // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}
+  let _toRows = (rows) => {
+    let result = [];
+    for (row of rows) {
+      result.push({
+        id: row._id, data: [row.photo, row.name, row.dob, row.pos, row.email, row.phone, row.company, row.info]
+      });
+    }
+    return result;
+  };
+
+  // revealing model pattern, not revealing _toRows()
+  return {
+    readAll: _readAll
+  };
+}
+
+module.exports = contactsController;
+```
+
+And we need to call the controller when the route is used:
+
+`api/contacts/contacts-router.js`
+
+```javascript
+const express = require('express');
+const Contacts = require('./contacts-model');
+const contactsController = require('./contacts-controller')(Contacts);
+
+let routes = () => {
+  let contactsRouter = express.Router();
+
+  contactsRouter.get('/', (req, res) => {
+    contactsController.readAll((err, contacts) => {
+      if (err) {
+        res.sendStatus(400).send(err);
+      } else {
+        res.json(contacts);
+      }
+    });
+  });
+
+  return contactsRouter;
+}
+
+module.exports = routes;
+```
+Now the data is retrieved from the database.
+
+Let's review what is done now with the following viewpoints; 
+
+### [Separation of Concerns (SoC)](https://en.wikipedia.org/wiki/Separation_of_concerns)
+
+The router only is [concerned](https://en.wikipedia.org/wiki/Separation_of_concerns) with HTTP traffic. No DB stuff in here, only proper error handling. Yes, there is a dependency on the `Contacts` model however this is where the following comes in.
+
+### [Polymorphism](https://en.wikipedia.org/wiki/Polymorphism_(computer_science))
+
+Because of the controller uses [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) the controller can be hypothetically be used for other controller, if the fields are passed with it. This is maybe something we do in future. So here's a list of task that can be done to improve the code even more:
+
+- [ ] pass the structure of the model along with the constructor
+- [ ] improve the data population script so it ends after running it, but only after all db actions are completed.
+- [ ] improve the error handler so that dhx also knows what is going on if an error occurs
+- [ ] make the Date of Birth a real date
 
 # References
 

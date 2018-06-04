@@ -666,6 +666,8 @@ Mongoose: contacts.insertOne({ _id: ObjectId("5b0ea66a948a28613642d50f"), photo:
 
 The only thing we need to do now is read the contacts.json file, loop though the data and create all contacts.
 
+`contacts-model.spec.js`
+
 ```javascript
 const mongoose = require('mongoose');
 const Contact = require('./contacts-model');
@@ -684,7 +686,7 @@ fs.readFile('./contacts.json', (err, data) => {
   if (err) console.log('error', err);
   obj = JSON.parse(data);
   for (contact of obj.rows) {
-    console.log(`Creating ${contact.data[1]}`);
+    console.log(`Creating ${contact.data[1]}...`);
     contact = new Contact({
       photo: contact.data[0],
       name: contact.data[1],
@@ -692,7 +694,8 @@ fs.readFile('./contacts.json', (err, data) => {
       pos: contact.data[3],
       email: contact.data[4],
       phone: contact.data[5],
-      info: contact.data[6]
+      company: contact.data[6],
+      info: contact.data[7]
     });
 
     contact.save(err => {
@@ -701,31 +704,69 @@ fs.readFile('./contacts.json', (err, data) => {
       }
     });
   }
-
-  process.exit();
 });
+
+
 ```
-Let's run it: `node contacts-model.spec.js`
+Let's run it: `node contacts-model.spec.js` but first, empty the table to make sure all data is clean
 
 ```bash
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ mongo
+MongoDB shell version: 3.2.11
+connecting to: test
+Server has startup warnings: 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] ** WARNING: This 32-bit MongoDB binary is deprecated
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] ** NOTE: This is a 32 bit MongoDB binary.
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] **       32 bit builds are limited to less than 2GB of data (or less with --journal).
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] **       See http://dochub.mongodb.org/core/32bit
+2018-06-04T11:12:23.300+0200 I CONTROL  [initandlisten] 
+> use cms
+switched to db cms
+> db.contacts.remove({})
+WriteResult({ "nRemoved" : 17 })
+> exit
+bye
 pi@raspberry:~/dhtmlx-json-node/api/contacts $ node contacts-model.spec.js 
-Creating Margaret Black
-Creating John Woken
-Creating Jake Peterson
-Creating Bill Jackson
-Creating Jennifer Miles
-Creating Cortny Barrens
-Creating Edward Eden
-Creating Andrew Scott
-Creating Steve Anderson
-Creating Jane Wilson
-Creating Alan Robbinson
-Creating William Parson
-Creating Charlotte Wolks
-Creating Pamela Worner
-Creating Ralf Ross
-Creating Dan Witley
-Creating Anna Harrison
+Creating Margaret Black...
+Creating John Woken...
+Creating Jake Peterson...
+Creating Bill Jackson...
+Creating Jennifer Miles...
+Creating Cortny Barrens...
+Creating Edward Eden...
+Creating Andrew Scott...
+Creating Steve Anderson...
+Creating Jane Wilson...
+Creating Alan Robbinson...
+Creating William Parson...
+Creating Charlotte Wolks...
+Creating Pamela Worner...
+Creating Ralf Ross...
+Creating Dan Witley...
+Creating Anna Harrison...
+Connected to mongoose
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf1"), photo: '<img src="imgs/contacts/small/margaret-black.jpg" border="0" class="contact_photo">', name: 'Margaret Black', dob: '9/1/1985', pos: 'CEO', email: 'mblack_ceo@mail.com', phone: '1-805-287-4750', company: 'M Black Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf2"), photo: '<img src="imgs/contacts/small/john-woken.jpg" border="0" class="contact_photo">', name: 'John Woken', dob: '3/24/1987', pos: 'Business analyst', email: 'john.woken@mail.com', phone: '1-867-777-9834', company: 'M-Black Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf3"), photo: '<img src="imgs/contacts/small/jake-peterson.jpg" border="0" class="contact_photo">', name: 'Jake Peterson', dob: '11/27/1982', pos: 'Accountant', email: 'jake.peterson@mail.com', phone: '1-845-257-9751', company: 'Jackson and partners Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf4"), photo: '<img src="imgs/contacts/small/bill-jackson.jpg" border="0" class="contact_photo">', name: 'Bill Jackson', dob: '5/3/1980', pos: 'Web developer', email: 'Bill.Jackson@mail.com', phone: '1-874-548-9751', company: 'BFG Consulting Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf5"), photo: '<img src="imgs/contacts/small/jennifer-miles.jpg" border="0" class="contact_photo">', name: 'Jennifer Miles', dob: '4/17/1985', pos: 'Project manager', email: 'Jennifer.Miles@mail.com', phone: '1-852-895-9752', company: 'F&M Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf6"), photo: '<img src="imgs/contacts/small/cortny-barrens.jpg" border="0" class="contact_photo">', name: 'Cortny Barrens', dob: '6/20/1979', pos: 'Sales manager', email: 'Cortny.Barrens@mail.com', phone: '1-842-458-1452', company: 'F&M Ltd', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf7"), photo: '<img src="imgs/contacts/small/edward-eden.jpg" border="0" class="contact_photo">', name: 'Edward Eden', dob: '1/14/1983', pos: 'Business analyst', email: 'Edward.Eden@mail.com', phone: '1-863-452-4750', company: 'BFG Consulting Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf8"), photo: '<img src="imgs/contacts/small/andrew-scott.jpg" border="0" class="contact_photo">', name: 'Andrew Scott', dob: '2/15/1980', pos: 'HR manager', email: 'Andrew.Scott@mail.com', phone: '1-874-452-4873', company: 'Jackson and partners Inc', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bf9"), photo: '<img src="imgs/contacts/small/steve-anderson.jpg" border="0" class="contact_photo">', name: 'Steve Anderson', dob: '4/17/1978', pos: 'Business analyst', email: 'Steve.Anderson@mail.com', phone: '1-863-548-4874', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfa"), photo: '<img src="imgs/contacts/small/jane-wilson.jpg" border="0" class="contact_photo">', name: 'Jane Wilson', dob: '6/25/1980', pos: 'Product manager', email: 'Jane.Wilson@mail.com', phone: '1-863-452-9834', company: 'HDF Insurance', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfb"), photo: '<img src="imgs/contacts/small/alan-robbinson.jpg" border="0" class="contact_photo">', name: 'Alan Robbinson', dob: '8/16/1970', pos: 'Web developer', email: 'Alan.Robbinson@mail.com', phone: '1-863-452-9752', company: 'Meriton Group', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfc"), photo: '<img src="imgs/contacts/small/william-parson.jpg" border="0" class="contact_photo">', name: 'William Parson', dob: '10/2/1969', pos: 'Cheif engineer', email: 'William.Parson@mail.com', phone: '1-874-452-4877', company: 'ANG Learning', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfd"), photo: '<img src="imgs/contacts/small/charlotte-wolks.jpg" border="0" class="contact_photo">', name: 'Charlotte Wolks', dob: '12/4/1989', pos: 'Marketing specialist', email: 'Charlotte.Wolks@mail.com', phone: '1-863-452-4750', company: 'HDF Insurance', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bfe"), photo: '<img src="imgs/contacts/small/pamela-worner.jpg" border="0" class="contact_photo">', name: 'Pamela Worner', dob: '11/17/1976', pos: 'Business analyst', email: 'Pamela.Worner@mail.com', phone: '1-863-548-4879', company: 'ANG Learning', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13bff"), photo: '<img src="imgs/contacts/small/ralf-ross.jpg" border="0" class="contact_photo">', name: 'Ralf Ross', dob: '9/29/1973', pos: 'Sales manager', email: 'Ralf.Ross@mail.com', phone: '1-863-452-9751', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13c00"), photo: '<img src="imgs/contacts/small/dan-witley.jpg" border="0" class="contact_photo">', name: 'Dan Witley', dob: '1/5/1978', pos: 'Web developer', email: 'Dan.Witley@mail.com', phone: '1-874-452-9834', company: 'Bank of LA', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+Mongoose: contacts.insertOne({ _id: ObjectId("5b150f6369957c198ff13c01"), photo: '<img src="imgs/contacts/small/anna-harrison.jpg" border="0" class="contact_photo">', name: 'Anna Harrison', dob: '5/8/1984', pos: 'QA engineer', email: 'Anna.Harrison@mail.com', phone: '1-863-548-9751', company: 'Meriton Group', created: new Date("Mon, 04 Jun 2018 10:07:31 GMT"), __v: 0 })
+^C
+pi@raspberry:~/dhtmlx-json-node/api/contacts $ ^C
 pi@raspberry:~/dhtmlx-json-node/api/contacts $ mongo
 MongoDB shell version: 3.2.11
 connecting to: test
@@ -744,20 +785,89 @@ switched to db cms
 contacts
 system.indexes
 > db.contacts.find()
-{ "_id" : ObjectId("5b0ea865a76e8063786396ec"), "photo" : "<img src=\"imgs/contacts/small/margaret-black.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Margaret Black", "dob" : ISODate("1985-08-31T22:00:00Z"), "pos" : "CEO", "email" : "mblack_ceo@mail.com", "phone" : "1-805-287-4750", "info" : "M Black Ltd", "created" : ISODate("2018-05-30T13:34:29.552Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396ee"), "photo" : "<img src=\"imgs/contacts/small/jake-peterson.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Jake Peterson", "dob" : ISODate("1982-11-26T23:00:00Z"), "pos" : "Accountant", "email" : "jake.peterson@mail.com", "phone" : "1-845-257-9751", "info" : "Jackson and partners Inc", "created" : ISODate("2018-05-30T13:34:29.555Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396ed"), "photo" : "<img src=\"imgs/contacts/small/john-woken.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "John Woken", "dob" : ISODate("1987-03-23T23:00:00Z"), "pos" : "Business analyst", "email" : "john.woken@mail.com", "phone" : "1-867-777-9834", "info" : "M-Black Ltd", "created" : ISODate("2018-05-30T13:34:29.554Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396ef"), "photo" : "<img src=\"imgs/contacts/small/bill-jackson.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Bill Jackson", "dob" : ISODate("1980-05-02T22:00:00Z"), "pos" : "Web developer", "email" : "Bill.Jackson@mail.com", "phone" : "1-874-548-9751", "info" : "BFG Consulting Inc", "created" : ISODate("2018-05-30T13:34:29.555Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396f1"), "photo" : "<img src=\"imgs/contacts/small/cortny-barrens.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Cortny Barrens", "dob" : ISODate("1979-06-19T22:00:00Z"), "pos" : "Sales manager", "email" : "Cortny.Barrens@mail.com", "phone" : "1-842-458-1452", "info" : "F&M Ltd", "created" : ISODate("2018-05-30T13:34:29.556Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396f0"), "photo" : "<img src=\"imgs/contacts/small/jennifer-miles.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Jennifer Miles", "dob" : ISODate("1985-04-16T22:00:00Z"), "pos" : "Project manager", "email" : "Jennifer.Miles@mail.com", "phone" : "1-852-895-9752", "info" : "F&M Ltd", "created" : ISODate("2018-05-30T13:34:29.556Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396f2"), "photo" : "<img src=\"imgs/contacts/small/edward-eden.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Edward Eden", "dob" : ISODate("1983-01-13T23:00:00Z"), "pos" : "Business analyst", "email" : "Edward.Eden@mail.com", "phone" : "1-863-452-4750", "info" : "BFG Consulting Inc", "created" : ISODate("2018-05-30T13:34:29.556Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396f4"), "photo" : "<img src=\"imgs/contacts/small/steve-anderson.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Steve Anderson", "dob" : ISODate("1978-04-16T22:00:00Z"), "pos" : "Business analyst", "email" : "Steve.Anderson@mail.com", "phone" : "1-863-548-4874", "info" : "Bank of LA", "created" : ISODate("2018-05-30T13:34:29.557Z"), "__v" : 0 }
-{ "_id" : ObjectId("5b0ea865a76e8063786396f5"), "photo" : "<img src=\"imgs/contacts/small/jane-wilson.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Jane Wilson", "dob" : ISODate("1980-06-24T22:00:00Z"), "pos" : "Product manager", "email" : "Jane.Wilson@mail.com", "phone" : "1-863-452-9834", "info" : "HDF Insurance", "created" : ISODate("2018-05-30T13:34:29.557Z"), "__v" : 0 }
+{ "_id" : ObjectId("5b150f6369957c198ff13bf6"), "photo" : "<img src=\"imgs/contacts/small/cortny-barrens.jpg\" border=\"0\" class=\"contact_photo\">", "name" : "Cortny Barrens", "dob" : "6/20/1979", "pos" : "Sales manager", "email" : "Cortny.Barrens@mail.com", "phone" : "1-842-458-1452", "company" : "F&M Ltd", "created" : ISODate("2018-06-04T10:07:31.128Z"), "__v" : 0 }
+ ... 
 Type "it" for more
 > exit
 bye
 
 ```
+
+Now that the data is in, let's try and get it via the script.
+
+For this we need a controller:
+
+`api/contacts/contacts-controller.js`
+
+```javascript
+let contactsController = (Model) => {
+  // hardcoded header
+  let _head = [
+    { "id": "photo", "width": "65", "type": "ro", "align": "center", "sort": "na", "value": "<span style='padding-left:60px;'>Name</span>" },
+    { "id": "name", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "#cspan" },
+    { "id": "dob", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Date of Birth" },
+    { "id": "pos", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Position" },
+    { "id": "email", "width": "170", "type": "ro", "align": "left", "sort": "na", "value": "E-mail Address" },
+    { "id": "phone", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Phone" },
+    { "id": "company", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Company" },
+    { "id": "info", "width": "*", "type": "ro", "align": "left", "sort": "na", "value": "Additional" }];
+
+  // just find all data in table
+  let _readAll = (callback) => {
+    Model.find({}, (err, contacts) => {
+      if (err) callback(err, null);
+      else callback(null, { head: _head, rows: _toRows(contacts) });
+    });
+  };
+
+  // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}
+  let _toRows = (rows) => {
+    let result = [];
+    for (row of rows) {
+      result.push({
+        id: row._id, data: [row.photo, row.name, row.dob, row.pos, row.email, row.phone, row.company, row.info]
+      });
+    }
+    return result;
+  };
+
+  // revealing model pattern, not revealing _toRows()
+  return {
+    readAll: _readAll
+  };
+}
+
+module.exports = contactsController;
+```
+
+And we need to call the controller when the route is used:
+
+`api/contacts/contacts-router.js`
+
+```javascript
+const express = require('express');
+const Contacts = require('./contacts-model');
+const contactsController = require('./contacts-controller')(Contacts);
+
+let routes = () => {
+  let contactsRouter = express.Router();
+
+  contactsRouter.get('/', (req, res) => {
+    contactsController.readAll((err, contacts) => {
+      if (err) {
+        res.sendStatus(400).send(err);
+      } else {
+        res.json(contacts);
+      }
+    });
+  });
+
+  return contactsRouter;
+}
+
+module.exports = routes;
+```
+Now the data is retrieved from the database.
 
 # References
 

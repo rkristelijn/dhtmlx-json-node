@@ -1,4 +1,4 @@
-// allow form to be centered within a cell
+ // allow form to be centered within a cell
 dhtmlXForm.prototype.centerForm = function () {
   this.cont.parentNode.style.overflow = "auto";
   this.cont.style.height = "auto";

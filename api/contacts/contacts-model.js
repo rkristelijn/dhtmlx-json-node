@@ -7,7 +7,7 @@ const ContactsSchema = mongoose.Schema({
   },
   photo: String,
   name: String,
-  dob: Date,
+  dob: String,
   pos: String,
   email: String,
   phone: String,

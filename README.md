@@ -869,6 +869,21 @@ module.exports = routes;
 ```
 Now the data is retrieved from the database.
 
+Let's review what is done now with the following viewpoints; 
+
+### [Separation of Concerns (SoC)](https://en.wikipedia.org/wiki/Separation_of_concerns)
+
+The router only is [concerned](https://en.wikipedia.org/wiki/Separation_of_concerns) with HTTP traffic. No DB stuff in here, only proper error handling. Yes, there is a dependency on the `Contacts` model however this is where the following comes in.
+
+### [Polymorphism](https://en.wikipedia.org/wiki/Polymorphism_(computer_science))
+
+Because of the controller uses [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) the controller can be hypothetically be used for other controller, if the fields are passed with it. This is maybe something we do in future. So here's a list of task that can be done to improve the code even more:
+
+- [ ] pass the structure of the model along with the constructor
+- [ ] improve the data population script so it ends after running it, but only after all db actions are completed.
+- [ ] improve the error handler so that dhx also knows what is going on if an error occurs
+- [ ] make the Date of Birth a real date
+
 # References
 
 [back to top](#plan)

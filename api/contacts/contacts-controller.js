@@ -18,6 +18,15 @@ let contactsController = (Model) => {
     });
   };
 
+  let _updateOne = (id, data, callback) => {
+    console.log('controller', id, data);
+    Model.findOneAndUpdate({ id: id }, data, (err, contact) => {
+      console.log('in callback');
+      if (err) callback(err, null);
+      else callback(null, contact);
+    }, { new: true });
+  };
+
   // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}
   let _toRows = (rows) => {
     let result = [];
@@ -31,7 +40,8 @@ let contactsController = (Model) => {
 
   // revealing model pattern, not revealing _toRows()
   return {
-    readAll: _readAll
+    readAll: _readAll,
+    updateOne: _updateOne
   };
 }
 

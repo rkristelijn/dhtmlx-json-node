@@ -886,6 +886,28 @@ Because of the controller uses [Dependency Injection](https://en.wikipedia.org/w
 - [ ] improve the error handler so that dhx also knows what is going on if an error occurs
 - [ ] make the Date of Birth a real date
 
+## Step 4e: PUT for updates
+
+[@see branch Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
+
+[back to top](#plan)
+
+Now that the GET is working, let's implement the PUT (update).
+
+Plan of approach
+
+- [ ] Implement PUT on the API
+- [ ] Make the grid editable
+- [ ] Implement fetch
+- [ ] Implement onBlur of form
+
+### PUT on API
+
+`npm i --save-dev express-log`
+
+`npm i --save body-parser`
+
+
 # References
 
 [back to top](#plan)

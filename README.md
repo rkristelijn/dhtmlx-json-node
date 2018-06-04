@@ -8,6 +8,8 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 2. mongodb server up and running
 3. up-to-date javascript, git, bash and mongodb skills
 
+You could have a look at setting up such an environment on either a [physical raspberry pi](https://www.linkedin.com/pulse/develop-full-stack-javascript-applications-using-only-remi-kristelijn/) or a [virtual raspberry pi](https://www.linkedin.com/pulse/my-perfect-javascript-developer-set-up-remi-kristelijn/).
+
 In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way. I think it is better to learn things the right way and later discover; 'hey... there is also a old or wrong way'. 
 
 This tutorial follows my development step by step using git branches. Every chapter contains a link to the feature branch.
@@ -24,7 +26,7 @@ This tutorial follows my development step by step using git branches. Every chap
     - [ ] Write some tests
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
-    - [ ] [GET using data from db](#step-4d-get-using-data-from-db)
+    - [x] [GET using data from db](#step-4d-get-using-data-from-db)
     - [ ] PUT for updates
     - [ ] POST for create
     - [ ] DELETE for delete

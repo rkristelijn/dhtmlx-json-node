@@ -18,13 +18,12 @@ let contactsController = (Model) => {
     });
   };
 
+  // find one and update with one atomic operation, forcing the altered document to return
   let _updateOne = (id, data, callback) => {
-    console.log('controller', id, data);
-    Model.findOneAndUpdate({ id: id }, data, (err, contact) => {
-      console.log('in callback');
+    Model.findOneAndUpdate({ _id: id }, data, { new: true }, (err, contact) => {
       if (err) callback(err, null);
       else callback(null, contact);
-    }, { new: true });
+    });
   };
 
   // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}

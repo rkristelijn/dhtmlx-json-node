@@ -903,10 +903,80 @@ Plan of approach
 
 ### PUT on API
 
+As we want to know what is going in in our HTTP traffic, we use `express-log`.
+
 `npm i --save-dev express-log`
+
+Because we need to parse the body that is being send, we need `body-parser`
 
 `npm i --save body-parser`
 
+Implement both:
+
+`index.js`
+
+```javascript
+// add the following lines to the top
+const bodyParser = require('body-parser');
+const logger = require('express-log');
+
+//...
+
+// set up middleware
+app.use(logger());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+```
+
+Now we can add the update step in the controller:
+
+`api/contacts/contacts-controller.js`
+
+```javascript
+// find one and update with one atomic operation, forcing the altered document to return
+let _updateOne = (id, data, callback) => {
+  Model.findOneAndUpdate({ _id: id }, data, { new: true }, (err, contact) => {
+    if (err) callback(err, null);
+    else callback(null, contact);
+  });
+};
+```
+
+And connect the router to the controller:
+
+`api/contacts/contacts-router.js`
+
+```javascript
+contactsRouter.put('/:id', (req, res) => {
+  contactsController.updateOne(req.params.id, req.body, (err, contact) => {
+    if (err) {
+      res.sendStatus(400).end(err);
+    } else {
+      res.json(contact);
+    }
+  });
+});
+```
+
+Let's use postman to send a PUT request. Keep in mind the following;
+
+- [ ] Your id is different, look in the GET call to get your own id
+- [ ] It is important to set `Content-Type` to `application/json` in the header
+
+```json
+{
+	"photo": "<img src='imgs/contacts/small/cortny-barrens.jpg' border='0' class='contact_photo'>",
+	"name": "Cortny Barrens 2",
+	"dob": "6/20/1979",
+	"pos": "Sales manager",
+	"email": "Cortny.Barrens@mail.com",
+	"phone":"1-842-458-1452",
+	"company":"F&M Ltd"
+}
+```
+
+![Postman showing a PUT request and a returned object](/tutorial_images/Screenshot_20180605_090250.png)
 
 # References
 

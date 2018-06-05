@@ -9,7 +9,7 @@ let routes = () => {
   contactsRouter.get('/', (req, res) => {
     contactsController.readAll((err, contacts) => {
       if (err) {
-        res.sendStatus(400).send(err);
+        res.sendStatus(400).end(err);
       } else {
         res.json(contacts);
       }
@@ -18,10 +18,9 @@ let routes = () => {
   });
 
   contactsRouter.put('/:id', (req, res) => {
-    console.log('putting...', req.params.id);
-    contactsController.updateOne(req.params.id, req.data, (err, contact) => {
+    contactsController.updateOne(req.params.id, req.body, (err, contact) => {
       if (err) {
-        res.sendStatus(400).send(err);
+        res.sendStatus(400).end(err);
       } else {
         res.json(contact);
       }

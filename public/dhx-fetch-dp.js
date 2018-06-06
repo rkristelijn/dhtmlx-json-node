@@ -73,13 +73,34 @@ function attachDp(obj) {
     console.log('onEditCancel', rowId, colInd, value);
   });
   //fires 1-3 times depending on cell's editability (see the stage parameter)
-  obj.attachEvent('onEditCell', (stage, rId, cInd, nValue, oValue) => {
-    console.log('onEditCell', stage, rId, cInd, nValue, oValue);
+  obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
+    //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
+    const beforeStart = 0;
+    const editorOpened = 1;
+    const editorClosed = 2;
+
+    if (stage === editorClosed & newValue !== oldValue) {
+      let fieldName = obj.getColumnId(colIndex);
+      fetch('/api/contacts/' + rowId, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT',
+        body: `{"${fieldName}":"${newValue}"}`
+      })
+        .then(response => response.json())
+        .then(response => {
+          console.log('then', response);
+        })
+        .catch(err => { console.error(err) });
+
+      return true;
+    }
   });
   //fires on clicking the dhtmlxgrid area which is not filled with data
-  obj.attachEvent('onEmptyClick', (ev) => {
-    console.log('onEmptyClick', ev);
-  });
+  // obj.attachEvent('onEmptyClick', (ev) => {
+  //   console.log('onEmptyClick', ev);
+  // });
   //fires immediately after the Enter key was pressed
   obj.attachEvent('onEnter', (id, ind) => {
     console.log('onEnter', id, ind);
@@ -118,9 +139,9 @@ function attachDp(obj) {
     console.log('onLiveValidationError', id, index, value, input, rule);
   });
   //fires when the mouse pointer is moved over a cell
-  obj.attachEvent('onMouseOver', (id, ind) => {
-    console.log('onMouseOver', id, ind);
-  });
+  // obj.attachEvent('onMouseOver', (id, ind) => {
+  //   console.log('onMouseOver', id, ind);
+  // });
   //fires on each resize iteration
   obj.attachEvent('onResize', (cInd, cWidth, obj) => {
     console.log('onResize', cInd, cWidth, obj);
@@ -195,12 +216,12 @@ function attachDp(obj) {
     console.log('onUnGroup');
   });
   //fires when validation runs successfully
-  obj.attachEvent('onValidationCorrect', (id,index,value,rule) => {
-    console.log('onValidationCorrect', id,index,value,rule);
+  obj.attachEvent('onValidationCorrect', (id, index, value, rule) => {
+    console.log('onValidationCorrect', id, index, value, rule);
   });
   //fires when validation runs and rules execution are failed
-  obj.attachEvent('onValidationError', (id,index,value,rule) => {
-    console.log('onValidationError', id,index,value,rule);
+  obj.attachEvent('onValidationError', (id, index, value, rule) => {
+    console.log('onValidationError', id, index, value, rule);
   });
 
   let eventsList = [

@@ -984,7 +984,7 @@ The only thing left is to connect the front-end. Instead of using [`dhtmlxDataPr
 
 To create this we need basic understanding of the events of the grid.
 
-I've added all available eventhandlers that are mentioned in the documentation. Because of the various number of agruments, some need to return something and the lack of mention of the eventname, I needed to add all the events separately.
+I've added all available event-handlers that are mentioned in the documentation. Because of the various number of arguments, some need to return something and the lack of mention of the event-name, I needed to add all the events separately.
 
 Create a new file
 
@@ -1241,8 +1241,64 @@ contactsGrid.attachEvent("onRowInserted", contactsGridBold);
 
 Now you can click on rows, press tab/enter/shift-tab/arrow-keys, move headings, rightclick and you see the events fire in the console window.
 
+Looking at the events, the `onEditCell` looks like the most suitable for the PUT request.
 
+```javascript
+//fires 1-3 times depending on cell's editability (see the stage parameter)
+  obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
+    //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
+    const beforeStart = 0;
+    const editorOpened = 1;
+    const editorClosed = 2;
 
+    if (stage === editorClosed & newValue !== oldValue) {
+      let fieldName = obj.getColumnId(colIndex);
+      fetch('/api/contacts/' + rowId, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT',
+        body: `{"${fieldName}":"${newValue}"}`
+      })
+        .then(response => response.json())
+        .then(response => {
+          console.log('then', response);
+        })
+        .catch(err => { console.error(err) });
+
+      return true;
+    }
+  });
+```
+
+Also you need to change `api/contacts/contacts-controller.js` to allow editing `ro` to `ed`
+
+```javascript
+  let _head = [
+    { "id": "photo", "width": "65", "type": "ro", "align": "center", "sort": "na", "value": "<span style='padding-left:60px;'>Name</span>" },
+    { "id": "name", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "#cspan" },
+    { "id": "dob", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Date of Birth" },
+    { "id": "pos", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Position" },
+    { "id": "email", "width": "170", "type": "ed", "align": "left", "sort": "na", "value": "E-mail Address" },
+    { "id": "phone", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Phone" },
+    { "id": "company", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Company" },
+    { "id": "info", "width": "*", "type": "ed", "align": "left", "sort": "na", "value": "Additional" }
+  ];
+```
+And you need to set the editEvents in `public/app.js`
+
+```javascript
+// attach grid
+    contactsGrid = contactsLayout.cells("a").attachGrid();
+    contactsGrid.enableEditEvents(true,true,true);
+    contactsGrid.init();
+```
+
+Note to above:
+
+- [ ] There is no proper error handling (yet), it just assumes it works always.
+- [ ] The dataprocessor is now linked to a specific API-url, no no reuse for other grids or object (yet)
+- [ ] The dataprocessor assumes it is linked to a grid
 
 # References
 

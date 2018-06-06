@@ -119,6 +119,9 @@ function contactsInit(cell) {
 
     // attach grid
     contactsGrid = contactsLayout.cells("a").attachGrid();
+    //contactsGrid.setEditable(true);
+    contactsGrid.enableEditEvents(true,true,true);
+    contactsGrid.init();
     contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
       contactsGrid.selectRow(0, true);
     }, "json");

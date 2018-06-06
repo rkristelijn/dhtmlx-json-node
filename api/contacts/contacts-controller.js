@@ -2,13 +2,14 @@ let contactsController = (Model) => {
   // hardcoded header
   let _head = [
     { "id": "photo", "width": "65", "type": "ro", "align": "center", "sort": "na", "value": "<span style='padding-left:60px;'>Name</span>" },
-    { "id": "name", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "#cspan" },
-    { "id": "dob", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Date of Birth" },
-    { "id": "pos", "width": "130", "type": "ro", "align": "left", "sort": "na", "value": "Position" },
-    { "id": "email", "width": "170", "type": "ro", "align": "left", "sort": "na", "value": "E-mail Address" },
-    { "id": "phone", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Phone" },
-    { "id": "company", "width": "150", "type": "ro", "align": "left", "sort": "na", "value": "Company" },
-    { "id": "info", "width": "*", "type": "ro", "align": "left", "sort": "na", "value": "Additional" }];
+    { "id": "name", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "#cspan" },
+    { "id": "dob", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Date of Birth" },
+    { "id": "pos", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Position" },
+    { "id": "email", "width": "170", "type": "ed", "align": "left", "sort": "na", "value": "E-mail Address" },
+    { "id": "phone", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Phone" },
+    { "id": "company", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Company" },
+    { "id": "info", "width": "*", "type": "ed", "align": "left", "sort": "na", "value": "Additional" }
+  ];
 
   // just find all data in table
   let _readAll = (callback) => {

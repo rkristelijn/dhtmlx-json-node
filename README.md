@@ -978,6 +978,16 @@ Let's use postman to send a PUT request. Keep in mind the following;
 
 ![Postman showing a PUT request and a returned object](/tutorial_images/Screenshot_20180605_090250.png)
 
+The only thing left is to connect the front-end. Instead of using [`dhtmlxDataProcessor`](https://docs.dhtmlx.com/dataprocessor__index.html) on browser-side, connected to the [`dhtmlxConnector`](https://dhtmlx.com/docs/products/dhtmlxConnector/) server-side, I'm going to wire up the grid directly to fetch.
+
+![dhtmlxDataProcessor and dhtmlxConnector interaction diagram](tutorial_images/dataprocessor_front.png).
+
+To create this we need basic understanding of the events of the grid.
+
+// TODO
+
+
+
 # References
 
 [back to top](#plan)

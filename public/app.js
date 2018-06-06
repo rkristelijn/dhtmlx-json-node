@@ -1,4 +1,4 @@
- // allow form to be centered within a cell
+// allow form to be centered within a cell
 dhtmlXForm.prototype.centerForm = function () {
   this.cont.parentNode.style.overflow = "auto";
   this.cont.style.height = "auto";
@@ -126,6 +126,7 @@ function contactsInit(cell) {
     contactsGrid.attachEvent("onRowSelect", contactsFillForm);
     contactsGrid.attachEvent("onRowInserted", contactsGridBold);
 
+    attachDp(contactsGrid);
     // attach form
     contactsForm = contactsLayout.cells("b").attachForm([
       { type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 },

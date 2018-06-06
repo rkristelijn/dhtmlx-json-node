@@ -123,11 +123,12 @@ function contactsInit(cell) {
       contactsGrid.selectRow(0, true);
     }, "json");
 
+    attachDp(contactsGrid);
+    // attach form
+
     contactsGrid.attachEvent("onRowSelect", contactsFillForm);
     contactsGrid.attachEvent("onRowInserted", contactsGridBold);
 
-    attachDp(contactsGrid);
-    // attach form
     contactsForm = contactsLayout.cells("b").attachForm([
       { type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 },
       { type: "container", name: "photo", label: "", inputWidth: 160, inputHeight: 160, offsetTop: 20, offsetLeft: 65 },

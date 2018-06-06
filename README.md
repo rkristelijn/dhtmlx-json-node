@@ -984,7 +984,263 @@ The only thing left is to connect the front-end. Instead of using [`dhtmlxDataPr
 
 To create this we need basic understanding of the events of the grid.
 
-// TODO
+I've added all available eventhandlers that are mentioned in the documentation. Because of the various number of agruments, some need to return something and the lack of mention of the eventname, I needed to add all the events separately.
+
+Create a new file
+
+`public/dhx-fetch-dp-js`
+
+```javascript
+function attachDp(obj) {
+  //fires after a row has been deleted from the grid
+  obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+    console.log('onAfterRowDeleted', id, pid);
+  });
+  //fires when the user starts selecting a block
+  obj.attachEvent('onBeforeBlockSelected', (rId, cInd) => {
+    console.log('onBeforeBlockSelected', rId, cInd);
+  });
+  //fires when the drag operation starts
+  obj.attachEvent('onBeforeDrag', (id) => {
+    console.log('onBeforeDrag', id);
+  });
+  //fires right before a row is deleted
+  obj.attachEvent('onBeforeRowDeleted', (rId) => {
+    console.log('onBeforeRowDeleted', rId);
+  });
+  //fires after clicking by the right mouse button on the selection block
+  obj.attachEvent('onBlockRightClick', (block, object) => {
+    console.log('onBlockRightClick', block, object);
+  });
+  //fires when a calendar pops up in the grid
+  obj.attachEvent('onCalendarShow', (myCal, rowId, colInd) => {
+    console.log('onCalendarShow', myCal, rowId, colInd);
+  });
+  //fires immediately after a cell has been selected
+  obj.attachEvent('onCellMarked', (rId, ind) => {
+    console.log('onCellMarked', rId, ind);
+  });
+  //fires immediately after a cell is unselected
+  obj.attachEvent('onCellUnMarked', (rId, ind) => {
+    console.log('onCellUnMarked', rId, ind);
+  });
+  //fires after the state of a checkbox has been changed
+  obj.attachEvent('onCheck', (rId, cInd, state) => {
+    console.log('onCheck', rId, cInd, state);
+  });
+  //the event is deprecated, use the onCheck event instead; fires after the state was changed
+  // obj.attachEvent('onCheckbox', (rId, cInd, state) => {
+  //   console.log('onCheckbox', rId, cInd, state);
+  // });
+  //fires when the grid is cleared (reloaded)
+  obj.attachEvent('onClearAll', () => {
+    console.log('onClearAll');
+  });
+  //fires after the values have been collected to fill the select filter
+  obj.attachEvent('onCollectValues', (index) => {
+    console.log('onCollectValues', index);
+    return true; //mandatory for the default processing
+  });
+  //fires when the data is loaded to the grid but hasn't been rendered yet
+  obj.attachEvent('onDataReady', () => {
+    console.log('onDataReady');
+  });
+  //fires on calendar's initialization on the page
+  obj.attachEvent('onDhxCalendarCreated', (myCal) => {
+    console.log('onDhxCalendarCreated', myCal);
+  });
+  //fires on the end of distributed parsing
+  obj.attachEvent('onDistributedEnd', () => {
+    console.log('onDistributedEnd');
+  });
+  //fires when an item is dragged to another target and the mouse is released, the event can be blocked
+  obj.attachEvent('onDrag', (sId, tId, sObj, tObj, sInd, tInd) => {
+    console.log('onDrag', sId, tId, sObj, tObj, sInd, tInd);
+  });
+  //fires before requesting additional data from the server in case of dynamic Smart Rendering or dynamic Paging
+  obj.attachEvent('onDynXLS', (start, count) => {
+    console.log('onDynXLS', start, count);
+  });
+  //fires when the edit operation was canceled
+  obj.attachEvent('onEditCancel', (rowId, colInd, value) => {
+    console.log('onEditCancel', rowId, colInd, value);
+  });
+  //fires 1-3 times depending on cell's editability (see the stage parameter)
+  obj.attachEvent('onEditCell', (stage, rId, cInd, nValue, oValue) => {
+    console.log('onEditCell', stage, rId, cInd, nValue, oValue);
+  });
+  //fires on clicking the dhtmlxgrid area which is not filled with data
+  obj.attachEvent('onEmptyClick', (ev) => {
+    console.log('onEmptyClick', ev);
+  });
+  //fires immediately after the Enter key was pressed
+  obj.attachEvent('onEnter', (id, ind) => {
+    console.log('onEnter', id, ind);
+  });
+  //fires when filtering is completed (filtering extension)
+  obj.attachEvent('onFilterEnd', (elements) => {
+    console.log('onFilterEnd', elements);
+  });
+  //fires when filtering has been activated but before the real filtering started
+  obj.attachEvent('onFilterStart', (indexes, values) => {
+    console.log('onFilterStart', indexes, values);
+    return true; //The event is blockable. Returning false will block the default action. returning true will confirm filtering
+  });
+  //fires immediately after a row has been added/deleted or the grid has been reordered
+  obj.attachEvent('onGridReconstructed', (obj) => {
+    console.log('onGridReconstructed', obj);
+  });
+  //fires when a grid was grouped by some column
+  obj.attachEvent('onGroup', () => {
+    console.log('onGroup');
+  });
+  //fires when a group was opened/closed
+  obj.attachEvent('onGroupStateChanged', (value, state) => {
+    console.log('onGroupStateChanged', value, state);
+  });
+  //fires on pressing the Down-Arrow button while the last row of the page is selected
+  obj.attachEvent('onLastRow', () => {
+    console.log('onLastRow');
+  });
+  //fires when validation runs successfully
+  obj.attachEvent('onLiveValidationCorrect', (id, index, value, input, rule) => {
+    console.log('onLiveValidationCorrect', id, index, value, input, rule);
+  });
+  //fires when validation runs and rules execution are failed
+  obj.attachEvent('onLiveValidationError', (id, index, value, input, rule) => {
+    console.log('onLiveValidationError', id, index, value, input, rule);
+  });
+  //fires when the mouse pointer is moved over a cell
+  obj.attachEvent('onMouseOver', (id, ind) => {
+    console.log('onMouseOver', id, ind);
+  });
+  //fires on each resize iteration
+  obj.attachEvent('onResize', (cInd, cWidth, obj) => {
+    console.log('onResize', cInd, cWidth, obj);
+  });
+  //fires when resizing of a column is finished
+  obj.attachEvent('onResizeEnd', (obj) => {
+    console.log('onResizeEnd', obj);
+  });
+  //fires immediately after the right mouse button has been clicked on a grid's row
+  obj.attachEvent('onRightClick', (id, ind, obj) => {
+    console.log('onRightClick', id, ind, obj);
+  });
+  //fires right after a row has been added to the grid
+  obj.attachEvent('onRowAdded', (rId) => {
+    console.log('onRowAdded', rId);
+  });
+  //fires when the row is hiding
+  obj.attachEvent('onRowHide', (id, state) => {
+    console.log('onRowHide', id, state);
+  });
+  //fires after the ID of a row has been changed (changeRowId, setRowId, dataprocessor)
+  obj.attachEvent('onRowIdChange', (oldId, newId) => {
+    console.log('onRowIdChange', oldId, newId);
+  });
+  //fires when the row is added to the grid and filled with data
+  obj.attachEvent('onRowInserted', (row, rInd) => {
+    console.log('onRowInserted', row, rInd);
+  });
+  //fires for each row pasted from the clipboard (block selection extension)
+  obj.attachEvent('onRowPaste', (rId) => {
+    console.log('onRowPaste', rId);
+  });
+  //fires immediately after a row in the grid has been clicked
+  obj.attachEvent('onRowSelect', (id, ind) => {
+    console.log('onRowSelect', id, ind);
+  });
+  //fires immediately after scrolling has occured
+  obj.attachEvent('onScroll', (sLeft, sTop) => {
+    console.log('onScroll', sLeft, sTop);
+  });
+  //fires immediately when the selection state has been changed
+  obj.attachEvent('onSelectStateChanged', (id) => {
+    console.log('onSelectStateChanged', id);
+  });
+  //fires after the stat values have been calculated
+  obj.attachEvent('onStatReady', () => {
+    console.log('onStatReady');
+  });
+  //fires when sub-row-ajax cell loads its data
+  obj.attachEvent('onSubAjaxLoad', (id, content) => {
+    console.log('onSubAjaxLoad', id, content);
+  });
+  //fires when the creation of a sub-grid was initialized (can be blocked)
+  obj.attachEvent('onSubGridCreated', (obj, rowId, rowIndex) => {
+    console.log('onSubGridCreated', obj, rowId, rowIndex);
+    return true;
+  });
+  //fires when a sub-row(sub-grid) was opened/closed
+  obj.attachEvent('onSubRowOpen', (id, state) => {
+    console.log('onSubRowOpen', id, state);
+  });
+  //fires when data synchronization is finished
+  obj.attachEvent('onSyncApply', () => {
+    console.log('onSyncApply');
+  });
+  //fires during the tabulation in the grid, blockable
+  obj.attachEvent('onTab', (mode) => {
+    console.log('onTab', mode);
+  });
+  //fires when the grid was ungrouped
+  obj.attachEvent('onUnGroup', () => {
+    console.log('onUnGroup');
+  });
+  //fires when validation runs successfully
+  obj.attachEvent('onValidationCorrect', (id,index,value,rule) => {
+    console.log('onValidationCorrect', id,index,value,rule);
+  });
+  //fires when validation runs and rules execution are failed
+  obj.attachEvent('onValidationError', (id,index,value,rule) => {
+    console.log('onValidationError', id,index,value,rule);
+  });
+}
+```
+Then include the file for loading
+
+`public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="//cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+  <script src="//cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <script type="text/javascript" src="dhx-fetch-dp.js"></script><!--include before-->
+  <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>
+```
+
+And call the event bindings
+
+`public/app.js`
+
+```javascript
+// ...
+contactsGrid = contactsLayout.cells("a").attachGrid();
+contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+}, "json");
+
+attachDp(contactsGrid);
+// attach form
+contactsGrid.attachEvent("onRowSelect", contactsFillForm);
+contactsGrid.attachEvent("onRowInserted", contactsGridBold);
+// ...
+```
+
+![Screenshot of the events in console](Screenshot_20180606_141400.png)
+
+Now you can click on rows, press tab/enter/shift-tab/arrow-keys, move headings, rightclick and you see the events fire in the console window.
+
 
 
 

@@ -1237,7 +1237,7 @@ contactsGrid.attachEvent("onRowInserted", contactsGridBold);
 // ...
 ```
 
-![Screenshot of the events in console](Screenshot_20180606_141400.png)
+![Screenshot of the events in console](tutorial_images/Screenshot_20180606_141400.png)
 
 Now you can click on rows, press tab/enter/shift-tab/arrow-keys, move headings, rightclick and you see the events fire in the console window.
 

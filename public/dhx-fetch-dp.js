@@ -81,16 +81,18 @@ function attachDp(obj) {
 
     if (stage === editorClosed & newValue !== oldValue) {
       let fieldName = obj.getColumnId(colIndex);
-      fetch('/api/contacts/' + rowId, {
+      let request = `{"${fieldName}":"${newValue}"}`;
+      console.log('request',  JSON.parse(request));
+      fetch(`/api/contacts/${rowId}`, {
         headers: {
           'Content-Type': 'application/json'
         },
         method: 'PUT',
-        body: `{"${fieldName}":"${newValue}"}`
+        body: request
       })
         .then(response => response.json())
         .then(response => {
-          console.log('then', response);
+          console.log('response', response);
         })
         .catch(err => { console.error(err) });
 

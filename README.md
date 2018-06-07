@@ -1245,30 +1245,32 @@ Looking at the events, the `onEditCell` looks like the most suitable for the PUT
 
 ```javascript
 //fires 1-3 times depending on cell's editability (see the stage parameter)
-  obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
-    //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
-    const beforeStart = 0;
-    const editorOpened = 1;
-    const editorClosed = 2;
+obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
+  //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
+  const beforeStart = 0;
+  const editorOpened = 1;
+  const editorClosed = 2;
 
-    if (stage === editorClosed & newValue !== oldValue) {
-      let fieldName = obj.getColumnId(colIndex);
-      fetch('/api/contacts/' + rowId, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'PUT',
-        body: `{"${fieldName}":"${newValue}"}`
+  if (stage === editorClosed & newValue !== oldValue) {
+    let fieldName = obj.getColumnId(colIndex);
+    let request = `{"${fieldName}":"${newValue}"}`;
+    console.log('request',  JSON.parse(request));
+    fetch(`/api/contacts/${rowId}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT',
+      body: request
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log('response', response);
       })
-        .then(response => response.json())
-        .then(response => {
-          console.log('then', response);
-        })
-        .catch(err => { console.error(err) });
+      .catch(err => { console.error(err) });
 
-      return true;
-    }
-  });
+    return true;
+  }
+});
 ```
 
 Also you need to change `api/contacts/contacts-controller.js` to allow editing `ro` to `ed`
@@ -1289,9 +1291,9 @@ And you need to set the editEvents in `public/app.js`
 
 ```javascript
 // attach grid
-    contactsGrid = contactsLayout.cells("a").attachGrid();
-    contactsGrid.enableEditEvents(true,true,true);
-    contactsGrid.init();
+contactsGrid = contactsLayout.cells("a").attachGrid();
+contactsGrid.enableEditEvents(true,true,true);
+contactsGrid.init();
 ```
 
 Note to above:
@@ -1299,6 +1301,10 @@ Note to above:
 - [ ] There is no proper error handling (yet), it just assumes it works always.
 - [ ] The dataprocessor is now linked to a specific API-url, no no reuse for other grids or object (yet)
 - [ ] The dataprocessor assumes it is linked to a grid
+
+Let's have a look at the result;
+
+![Application showing the request and the response in the console when updating any field in the contactsGrid](tutorial_images/Screenshot_20180607_101650.png)
 
 # References
 

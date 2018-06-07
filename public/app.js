@@ -119,15 +119,15 @@ function contactsInit(cell) {
 
     // attach grid
     contactsGrid = contactsLayout.cells("a").attachGrid();
-    contactsGrid.enableEditEvents(true,true,true);
+    contactsGrid.enableEditEvents(true, true, true);
     contactsGrid.init();
     contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
       contactsGrid.selectRow(0, true);
     }, "json");
 
-    attachDp(contactsGrid);
-    // attach form
+    attachDpGrid(contactsGrid, 'contactsGrid');
 
+    // attach form
     contactsGrid.attachEvent("onRowSelect", contactsFillForm);
     contactsGrid.attachEvent("onRowInserted", contactsGridBold);
 
@@ -138,10 +138,18 @@ function contactsInit(cell) {
       { type: "input", name: "email", label: "E-mail" },
       { type: "input", name: "phone", label: "Phone" },
       { type: "input", name: "company", label: "Company" },
-      { type: "input", name: "info", label: "Additional info" }
+      { type: "input", name: "info", label: "Additional info" },
+      { type: "input", name: "id", label: "RowId", attributes: ["readonly"], readonly: true }
     ]);
+    attachDpForm(contactsForm, 'contactsForm');
     contactsForm.setSizes = contactsForm.centerForm;
     contactsForm.setSizes();
+
+    contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
+      fieldIndex = contactsGrid.getColIndexById(field);
+      console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
+      contactsGrid.cells(rowId, fieldIndex).setValue(value);
+    });
   }
 }
 
@@ -534,6 +542,7 @@ function contactsFillForm(id) {
     var index = contactsGrid.getColIndexById(a);
     if (index != null && index >= 0) data[a] = String(contactsGrid.cells(id, index).getValue()).replace(/\&amp;?/gi, "&");
   }
+  data.id = id;
   contactsForm.setFormData(data);
   // change photo
   var img = contactsGrid.cells(id, contactsGrid.getColIndexById("photo")).getValue(); // <img src=....>

@@ -1306,6 +1306,341 @@ Let's have a look at the result;
 
 ![Application showing the request and the response in the console when updating any field in the contactsGrid](tutorial_images/Screenshot_20180607_101650.png)
 
+### Form
+
+Next up is the form. Let's do the same and connect all the events in a different js script
+
+- rename `dhx-fetch-dp.js` to `dhx-fetch-dp-grid.js`
+- create a new file `dhx-fetch-dp-form.js`
+- include both files in `index.html`
+- add another argument (`objectName`) of the function and rename the function in `dhx-fetch-dp-grid.js`, also prefix the `console.log()` with `objectName` using search/replace, or get it from the branch
+
+`public/dhx-fetch-dp-grid.js`
+
+```javascript
+function attachDpGrid(obj, objectName) {
+  //fires after a row has been deleted from the grid
+  obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+    console.log(objectName, 'onAfterRowDeleted', id, pid);
+  });
+// ...
+```
+
+`public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="//cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+  <script src="//cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <script type="text/javascript" src="dhx-fetch-dp-grid.js"></script>
+  <script type="text/javascript" src="dhx-fetch-dp-form.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>
+```
+`public/dhx-fetch-dp-form.js`
+
+```javascript
+function attachDpForm(obj, objectName) {
+  // onAfterReset	fires after resetting the form
+  obj.attachEvent('onAfterReset', (formId) => {
+    console.log(objectName, 'onAfterReset', formId);
+  });
+  // onAfterSave	fires after data has been saved in DB
+  obj.attachEvent('onAfterSave', (formId, response) => {
+    console.log(objectName, 'onAfterSave', formId, response);
+  });
+  // onAfterValidate	fires after the validation
+  obj.attachEvent('onAfterValidate', (success) => {
+    console.log(objectName, 'onAfterValidate', success);
+  });
+  // onBeforeChange	fires before the data in some input changed ( by user actions )
+  obj.attachEvent('onBeforeChange', (itemName, oldValue, newValue) => {
+    console.log(objectName, 'onBeforeChange', itemName, oldValue, newValue);
+    return true;
+  });
+  // onBeforeClear	fires before the user clears the list of files to upload (clicks the button )
+  obj.attachEvent('onBeforeClear', () => {
+    console.log(objectName, 'onBeforeClear');
+    return true;
+  });
+  // onBeforeDataLoad	fires after the data for the form received, but before it's assigned to actual fields
+  obj.attachEvent('onBeforeDataLoad', (formId, values) => {
+    console.log(objectName, 'onBeforeDataLoad', formId, values);
+    return true;
+  });
+  // onBeforeFileAdd	fires when the user adds a file to the upload queue
+  obj.attachEvent('onBeforeFileAdd', (fileName) => {
+    console.log(objectName, 'onBeforeFileAdd', fileName);
+    return true;
+  });
+  // onBeforeFileRemove	fires before the user removes a single file from the list of files to upload (clicks the button )
+  obj.attachEvent('onBeforeFileRemove', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onBeforeFileRemove', clientFileName, serverFileName);
+    return true;
+  });
+  // onBeforeFileUpload	fires before file uploading has started
+  obj.attachEvent('onBeforeFileUpload', (mode, loader, formData) => {
+    console.log(objectName, 'onBeforeFileUpload', mode, loader, formData);
+    return true;
+  });
+  // onBeforeReset	fires before resetting the form
+  obj.attachEvent('onBeforeReset', (formId, values) => {
+    console.log(objectName, 'onBeforeReset', formId, values);
+    return true;
+  });
+  // onBeforeSave	fires before saving the form
+  obj.attachEvent('onBeforeSave', (formId, values) => {
+    console.log(objectName, 'onBeforeSave', formId, values);
+    return true;
+  });
+  // onBeforeValidate	fires when validation has started but is not applied yet
+  obj.attachEvent('onBeforeValidate', (formId) => {
+    console.log(objectName, 'onBeforeValidate', formId);
+    return true;
+  });
+  // onBlur	fires when the user moves the mouse pointer out of the input
+  obj.attachEvent('onBlur', (itemName, value) => {
+    // value: item value (for checkboxes and radios only)
+    console.log(objectName, 'onBlur', itemName, value);
+  });
+  // onButtonClick	fires when the user clicks a button
+  obj.attachEvent('onButtonClick', (itemName) => {
+    console.log(objectName, 'onButtonClick', itemName);
+  });
+  // onChange	fires when data in some input was changed
+  obj.attachEvent('onChange', (itemName, value, state) => {
+    //state = checked/unchecked (for checkboxes and radios only)
+    console.log(objectName, 'onChange', itemName, value, state);
+  });
+  // onClear	when the user clears the list of files to upload (clicks on button )
+  obj.attachEvent('onClear', () => {
+    console.log(objectName, 'onClear');
+  });
+  // onDisable	fires when the container is disabled after being enabled
+  obj.attachEvent('onDisable', (itemName) => {
+    console.log(objectName, 'onDisable', itemName);
+  });
+  // onEditorAccess	fires when the user accesses the editor body
+  obj.attachEvent('onEditorAccess', (name, type, event, editor, form) => {
+    // name	string	the item's name
+    // type	string	the type of the accessing action (e.g. "mousedown","focus","mouseup","click", "blur")
+    // ev	object	the event object
+    // editor	object	the editor instance
+    // form	object	the form instance
+    console.log(objectName, 'onEditorAccess', name, type, event, editor, form);
+  });
+  // onEditorToolbarClick	fires when the user clicks the editor toolbar
+  obj.attachEvent('onEditorToolbarClick', (name, toolbarId, editor, form) => {
+    console.log(objectName, 'onEditorToolbarClick', name, toolbarId, editor, form);
+  });
+  // onEnable	fires when the container control is enabled after being disabled
+  obj.attachEvent('onEnable', (itemName) => {
+    console.log(objectName, 'onEnable', itemName);
+  });
+  // onEnter	fires on pressing the Enter button when the mouse pointer is set in an input control
+  obj.attachEvent('onEnter', (itemName) => {
+    console.log(objectName, 'onEnter', itemName);
+  });
+  // onFileAdd	fires when the user adds a file to the upload queue
+  obj.attachEvent('onFileAdd', (fileName) => {
+    console.log(objectName, 'onFileAdd', fileName);
+  });
+  // onFileRemove	fires when the user removes single file from the list of files to upload (clicks the button )
+  obj.attachEvent('onFileRemove', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onFileRemove', clientFileName, serverFileName);
+  });
+  // onFocus	fires when an input gets focus
+  obj.attachEvent('onFocus', (itemName, value) => {
+    // value: item value (for checkboxes and radios only)
+    console.log(objectName, 'onFocus', itemName, value);
+  });
+  // onImageUploadFail	fires when an image was uploaded incorrectly
+  obj.attachEvent('onImageUploadFail', (itemName, extra) => {
+    console.log(objectName, 'onImageUploadFail', itemName, extra);
+  });
+  // onImageUploadSuccess	fires when an image was uploaded correctly
+  obj.attachEvent('onImageUploadSuccess', (itemName, imageName, extra) => {
+    console.log(objectName, 'onImageUploadSuccess', itemName, imageName, extra);
+  });
+  // onInfo	fires when the user clicks the Info icon
+  obj.attachEvent('onInfo', (itemName, event) => {
+    console.log(objectName, 'onInfo', itemName, event);
+  });
+  // onInputChange	fires when data in an input was changed and the cursor is still in this input
+  obj.attachEvent('onInputChange', (itemName, value, form) => {
+    console.log(objectName, 'onInputChange', itemName, value, form);
+  });
+  // onKeydown	fires when the native "onkeydown" event is triggered
+  obj.attachEvent('onKeydown', (inputElement, eventObject, itemName, value) => {
+    console.log(objectName, 'onKeydown', inputElement, eventObject, itemName, value);
+  });
+  // onKeyup	fires when the native "onkeyup" event is triggered
+  obj.attachEvent('onKeyup', (inputElement, eventObject, itemName, value) => {
+    console.log(objectName, 'onKeyup', inputElement, eventObject, itemName, value);
+  });
+  // onOptionsLoaded	fires after the item options were completely loaded from the server to the client
+  obj.attachEvent('onOptionsLoaded', (itemName) => {
+    console.log(objectName, 'onOptionsLoaded', itemName);
+  });
+  // onUploadCancel	fires when the user cancels uploading of a file (clicks the button ).
+  obj.attachEvent('onUploadCancel', (fileName) => {
+    console.log(objectName, 'onUploadCancel', fileName);
+  });
+  // onUploadComplete	fires when all files from the list have been uploaded to the server
+  obj.attachEvent('onUploadComplete', (count) => {
+    console.log(objectName, 'onUploadComplete', count);
+  });
+  // onUploadFail	fires when the file upload has failed
+  obj.attachEvent('onUploadFail', (fileName) => {
+    //fileName the real name of the file (as it's displayed in the control)
+    console.log(objectName, 'onUploadFail', fileName);
+  });
+  // onUploadFile	fires when a single file from the list has been uploaded to the server
+  obj.attachEvent('onUploadFile', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onUploadFile', clientFileName, serverFileName);
+  });
+  // onValidateError	fires for each error during validation
+  obj.attachEvent('onValidateError', (name, value, result) => {
+    console.log(objectName, 'onValidateError', name, value, result);
+  });
+  // onValidateSuccess	fires for each success during validation
+  obj.attachEvent('onValidateSuccess', (name, value, result) => {
+    console.log(objectName, 'onValidateSuccess', name, value, result);
+  });
+  // onXLE	fires when the data loading is finished and a component or data is rendered
+  obj.attachEvent('onXLE', () => {
+    //callback order: onXLS event => [request] => onXLE event => doOnLoad()
+    console.log(objectName, 'onXLE');
+  });
+  // onXLS	fires when XML loading started
+  obj.attachEvent('onXLS', () => {
+    //callback order: onXLS event => [request] => onXLE event => doOnLoad()
+    console.log(objectName, 'onXLS');
+  });
+}
+```
+
+update our main app so it binds the events
+
+`public/app.js`
+
+```javascript
+//...
+function contactsInit(cell) {
+  if (contactsLayout == null) {
+    // init layout
+    contactsLayout = cell.attachLayout("2U");
+    contactsLayout.cells("a").hideHeader();
+    contactsLayout.cells("b").hideHeader();
+    contactsLayout.cells("b").setWidth(330);
+    contactsLayout.cells("b").fixSize(true, true);
+    contactsLayout.setAutoSize("a", "a;b");
+
+    // attach grid
+    contactsGrid = contactsLayout.cells("a").attachGrid();
+    contactsGrid.enableEditEvents(true,true,true);
+    contactsGrid.init();
+    contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
+      contactsGrid.selectRow(0, true);
+    }, "json");
+
+    attachDpGrid(contactsGrid, 'contactsGrid'); // <<<<
+
+    // attach form
+    contactsGrid.attachEvent("onRowSelect", contactsFillForm);
+    contactsGrid.attachEvent("onRowInserted", contactsGridBold);
+
+    contactsForm = contactsLayout.cells("b").attachForm([
+      { type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 },
+      { type: "container", name: "photo", label: "", inputWidth: 160, inputHeight: 160, offsetTop: 20, offsetLeft: 65 },
+      { type: "input", name: "name", label: "Name", offsetTop: 20 },
+      { type: "input", name: "email", label: "E-mail" },
+      { type: "input", name: "phone", label: "Phone" },
+      { type: "input", name: "company", label: "Company" },
+      { type: "input", name: "info", label: "Additional info" }
+    ]);
+    attachDpForm(contactsForm, 'contactsForm'); // <<<<
+    contactsForm.setSizes = contactsForm.centerForm;
+    contactsForm.setSizes();
+  }
+}
+//...
+```
+![Form events showing in the console](tutorial_images/Screenshot_20180607_153040.png)
+
+Looking at the events, the `onChange` seems the most suitable to fire a request to the API.
+
+This is what we have to do;
+
+- [ ] get all data to be send
+- [ ] send the data
+- [ ] sync with the grid 
+
+Getting the `rowId` is not that hard: 
+
+```javascript
+obj.getItemValue('id');
+```
+
+Sending the request is the same as in the grid, but then we have a problem; how are we going to communicate back to grid within this function? Let me try to see if we can create a custom event:
+
+```javascript
+obj.callEvent("onAfterChange", [rowId, itemName, value]);
+```
+So in the script:
+
+`public/dhx-fetch-dp-form.js`
+
+```javascript
+// onChange	fires when data in some input was changed
+obj.attachEvent('onChange', (itemName, value, state) => {
+  //state = checked/unchecked (for checkboxes and radios only)
+  console.log(objectName, 'onChange', itemName, value, state);
+  let rowId = obj.getItemValue('id');
+  let request = `{"${itemName}":"${value}"}`;
+  console.log(objectName, 'request', JSON.parse(request), rowId);
+  fetch(`/api/contacts/${rowId}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'PUT',
+    body: request
+  })
+    .then(response => response.json())
+    .then(response => {
+      console.log(objectName, 'response', response);
+      // call a custom event, onAfterChange doesn't exist
+      obj.callEvent("onAfterChange", [rowId, itemName, value]);
+    })
+    .catch(err => { console.error(err) });
+});
+```
+
+If that is possible we can easily 'catch' it again in the app.js, where all items are in this way:
+
+`pubilc/app.js`
+
+```javascript
+contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
+  fieldIndex = contactsGrid.getColIndexById(field);
+  console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
+  contactsGrid.cells(rowId, fieldIndex).setValue(value);
+});
+```
+
+What do you know, it works.
+
+![Screenshot of updating the form: connected to the grid](tutorial_images/Screenshot_20180607_162339.png)
+
 # References
 
 [back to top](#plan)

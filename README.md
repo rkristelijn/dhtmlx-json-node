@@ -1625,7 +1625,7 @@ obj.attachEvent('onChange', (itemName, value, state) => {
 });
 ```
 
-If that is possible we can easily 'catch' it again in the app.js, where all items are in this way:
+If that is possible we can easily 'catch' it again in the app.js, where all items are spaghetti-coded anyway:
 
 `pubilc/app.js`
 
@@ -1637,7 +1637,7 @@ contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
 });
 ```
 
-What do you know, it works.
+What do you know, it works. You cn check it out at [Brach Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
 
 ![Screenshot of updating the form: connected to the grid](tutorial_images/Screenshot_20180607_162339.png)
 

@@ -28,7 +28,7 @@ This tutorial follows my development step by step using git branches. Every chap
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
     - [x] [PUT for updates](#step-4e-put-for-updates) for the grid and the from
-    - [ ] [POST for create](#step-4d-post-for-create)
+    - [x] [POST for create](#step-4d-post-for-create)
     - [ ] DELETE for delete
 
   - [References](#references)

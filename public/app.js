@@ -150,6 +150,20 @@ function contactsInit(cell) {
       console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
       contactsGrid.cells(rowId, fieldIndex).setValue(value);
     });
+
+    contactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId) => {
+      console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId);
+      contactsGrid.changeRowId(tempRowId, serverRowId);
+    });
+
+    mainToolbar.attachEvent("onClick", (buttonId) => {
+      if(mainSidebar.getActiveItem() === 'contacts') {
+        console.log("mainToolbar/contact", "onClick", buttonId);
+        let rowId = contactsGrid.uid();
+        contactsGrid.addRow(rowId, "");
+        contactsGrid.selectRowById(rowId);
+      }
+    });
   }
 }
 
@@ -204,6 +218,12 @@ function projectsInit(cell) {
       tabs: [
         { id: "stats", text: "Stats", selected: 1 }
       ]
+    });
+
+    mainToolbar.attachEvent("onClick", (buttonId) => {
+      if(mainSidebar.getActiveItem() === 'projects') {
+        console.log("mainToolbar/projects", "onClick", buttonId);
+      }
     });
   }
 }

@@ -159,6 +159,18 @@ function attachDpGrid(obj, objectName) {
   //fires right after a row has been added to the grid
   obj.attachEvent('onRowAdded', (rId) => {
     console.log(objectName, 'onRowAdded', rId);
+    fetch(`/api/contacts/`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log(objectName, 'response', response);
+        obj.callEvent("onAfterRowAdded", [rId, response._id]);
+      })
+      .catch(err => { console.error(err) });
   });
   //fires when the row is hiding
   obj.attachEvent('onRowHide', (id, state) => {
@@ -181,9 +193,9 @@ function attachDpGrid(obj, objectName) {
     console.log(objectName, 'onRowSelect', id, ind);
   });
   //fires immediately after scrolling has occured
-  obj.attachEvent('onScroll', (sLeft, sTop) => {
-    console.log(objectName, 'onScroll', sLeft, sTop);
-  });
+  // obj.attachEvent('onScroll', (sLeft, sTop) => {
+  //   console.log(objectName, 'onScroll', sLeft, sTop);
+  // });
   //fires immediately when the selection state has been changed
   // obj.attachEvent('onSelectStateChanged', (id) => {
   //   console.log(objectName, 'onSelectStateChanged', id);

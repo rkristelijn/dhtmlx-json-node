@@ -27,7 +27,7 @@ This tutorial follows my development step by step using git branches. Every chap
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
-    - [ ] PUT for updates
+    - [ ] [PUT for updates](#step-4e-put-for-updates)
     - [ ] POST for create
     - [ ] DELETE for delete
 
@@ -885,6 +885,761 @@ Because of the controller uses [Dependency Injection](https://en.wikipedia.org/w
 - [ ] improve the data population script so it ends after running it, but only after all db actions are completed.
 - [ ] improve the error handler so that dhx also knows what is going on if an error occurs
 - [ ] make the Date of Birth a real date
+
+## Step 4e: PUT for updates
+
+[@see branch Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
+
+[back to top](#plan)
+
+Now that the GET is working, let's implement the PUT (update).
+
+Plan of approach
+
+- [ ] Implement PUT on the API
+- [ ] Make the grid editable
+- [ ] Implement fetch
+- [ ] Implement onBlur of form
+
+### PUT on API
+
+As we want to know what is going in in our HTTP traffic, we use `express-log`.
+
+`npm i --save-dev express-log`
+
+Because we need to parse the body that is being send, we need `body-parser`
+
+`npm i --save body-parser`
+
+Implement both:
+
+`index.js`
+
+```javascript
+// add the following lines to the top
+const bodyParser = require('body-parser');
+const logger = require('express-log');
+
+//...
+
+// set up middleware
+app.use(logger());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+```
+
+Now we can add the update step in the controller:
+
+`api/contacts/contacts-controller.js`
+
+```javascript
+// find one and update with one atomic operation, forcing the altered document to return
+let _updateOne = (id, data, callback) => {
+  Model.findOneAndUpdate({ _id: id }, data, { new: true }, (err, contact) => {
+    if (err) callback(err, null);
+    else callback(null, contact);
+  });
+};
+```
+
+And connect the router to the controller:
+
+`api/contacts/contacts-router.js`
+
+```javascript
+contactsRouter.put('/:id', (req, res) => {
+  contactsController.updateOne(req.params.id, req.body, (err, contact) => {
+    if (err) {
+      res.sendStatus(400).end(err);
+    } else {
+      res.json(contact);
+    }
+  });
+});
+```
+
+Let's use postman to send a PUT request. Keep in mind the following;
+
+- [ ] Your id is different, look in the GET call to get your own id
+- [ ] It is important to set `Content-Type` to `application/json` in the header
+
+```json
+{
+	"photo": "<img src='imgs/contacts/small/cortny-barrens.jpg' border='0' class='contact_photo'>",
+	"name": "Cortny Barrens 2",
+	"dob": "6/20/1979",
+	"pos": "Sales manager",
+	"email": "Cortny.Barrens@mail.com",
+	"phone":"1-842-458-1452",
+	"company":"F&M Ltd"
+}
+```
+
+![Postman showing a PUT request and a returned object](/tutorial_images/Screenshot_20180605_090250.png)
+
+The only thing left is to connect the front-end. Instead of using [`dhtmlxDataProcessor`](https://docs.dhtmlx.com/dataprocessor__index.html) on browser-side, connected to the [`dhtmlxConnector`](https://dhtmlx.com/docs/products/dhtmlxConnector/) server-side, I'm going to wire up the grid directly to fetch.
+
+![dhtmlxDataProcessor and dhtmlxConnector interaction diagram](tutorial_images/dataprocessor_front.png).
+
+To create this we need basic understanding of the events of the grid.
+
+I've added all available event-handlers that are mentioned in the documentation. Because of the various number of arguments, some need to return something and the lack of mention of the event-name, I needed to add all the events separately.
+
+Create a new file
+
+`public/dhx-fetch-dp-js`
+
+```javascript
+function attachDp(obj) {
+  //fires after a row has been deleted from the grid
+  obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+    console.log('onAfterRowDeleted', id, pid);
+  });
+  //fires when the user starts selecting a block
+  obj.attachEvent('onBeforeBlockSelected', (rId, cInd) => {
+    console.log('onBeforeBlockSelected', rId, cInd);
+  });
+  //fires when the drag operation starts
+  obj.attachEvent('onBeforeDrag', (id) => {
+    console.log('onBeforeDrag', id);
+  });
+  //fires right before a row is deleted
+  obj.attachEvent('onBeforeRowDeleted', (rId) => {
+    console.log('onBeforeRowDeleted', rId);
+  });
+  //fires after clicking by the right mouse button on the selection block
+  obj.attachEvent('onBlockRightClick', (block, object) => {
+    console.log('onBlockRightClick', block, object);
+  });
+  //fires when a calendar pops up in the grid
+  obj.attachEvent('onCalendarShow', (myCal, rowId, colInd) => {
+    console.log('onCalendarShow', myCal, rowId, colInd);
+  });
+  //fires immediately after a cell has been selected
+  obj.attachEvent('onCellMarked', (rId, ind) => {
+    console.log('onCellMarked', rId, ind);
+  });
+  //fires immediately after a cell is unselected
+  obj.attachEvent('onCellUnMarked', (rId, ind) => {
+    console.log('onCellUnMarked', rId, ind);
+  });
+  //fires after the state of a checkbox has been changed
+  obj.attachEvent('onCheck', (rId, cInd, state) => {
+    console.log('onCheck', rId, cInd, state);
+  });
+  //the event is deprecated, use the onCheck event instead; fires after the state was changed
+  // obj.attachEvent('onCheckbox', (rId, cInd, state) => {
+  //   console.log('onCheckbox', rId, cInd, state);
+  // });
+  //fires when the grid is cleared (reloaded)
+  obj.attachEvent('onClearAll', () => {
+    console.log('onClearAll');
+  });
+  //fires after the values have been collected to fill the select filter
+  obj.attachEvent('onCollectValues', (index) => {
+    console.log('onCollectValues', index);
+    return true; //mandatory for the default processing
+  });
+  //fires when the data is loaded to the grid but hasn't been rendered yet
+  obj.attachEvent('onDataReady', () => {
+    console.log('onDataReady');
+  });
+  //fires on calendar's initialization on the page
+  obj.attachEvent('onDhxCalendarCreated', (myCal) => {
+    console.log('onDhxCalendarCreated', myCal);
+  });
+  //fires on the end of distributed parsing
+  obj.attachEvent('onDistributedEnd', () => {
+    console.log('onDistributedEnd');
+  });
+  //fires when an item is dragged to another target and the mouse is released, the event can be blocked
+  obj.attachEvent('onDrag', (sId, tId, sObj, tObj, sInd, tInd) => {
+    console.log('onDrag', sId, tId, sObj, tObj, sInd, tInd);
+  });
+  //fires before requesting additional data from the server in case of dynamic Smart Rendering or dynamic Paging
+  obj.attachEvent('onDynXLS', (start, count) => {
+    console.log('onDynXLS', start, count);
+  });
+  //fires when the edit operation was canceled
+  obj.attachEvent('onEditCancel', (rowId, colInd, value) => {
+    console.log('onEditCancel', rowId, colInd, value);
+  });
+  //fires 1-3 times depending on cell's editability (see the stage parameter)
+  obj.attachEvent('onEditCell', (stage, rId, cInd, nValue, oValue) => {
+    console.log('onEditCell', stage, rId, cInd, nValue, oValue);
+  });
+  //fires on clicking the dhtmlxgrid area which is not filled with data
+  obj.attachEvent('onEmptyClick', (ev) => {
+    console.log('onEmptyClick', ev);
+  });
+  //fires immediately after the Enter key was pressed
+  obj.attachEvent('onEnter', (id, ind) => {
+    console.log('onEnter', id, ind);
+  });
+  //fires when filtering is completed (filtering extension)
+  obj.attachEvent('onFilterEnd', (elements) => {
+    console.log('onFilterEnd', elements);
+  });
+  //fires when filtering has been activated but before the real filtering started
+  obj.attachEvent('onFilterStart', (indexes, values) => {
+    console.log('onFilterStart', indexes, values);
+    return true; //The event is blockable. Returning false will block the default action. returning true will confirm filtering
+  });
+  //fires immediately after a row has been added/deleted or the grid has been reordered
+  obj.attachEvent('onGridReconstructed', (obj) => {
+    console.log('onGridReconstructed', obj);
+  });
+  //fires when a grid was grouped by some column
+  obj.attachEvent('onGroup', () => {
+    console.log('onGroup');
+  });
+  //fires when a group was opened/closed
+  obj.attachEvent('onGroupStateChanged', (value, state) => {
+    console.log('onGroupStateChanged', value, state);
+  });
+  //fires on pressing the Down-Arrow button while the last row of the page is selected
+  obj.attachEvent('onLastRow', () => {
+    console.log('onLastRow');
+  });
+  //fires when validation runs successfully
+  obj.attachEvent('onLiveValidationCorrect', (id, index, value, input, rule) => {
+    console.log('onLiveValidationCorrect', id, index, value, input, rule);
+  });
+  //fires when validation runs and rules execution are failed
+  obj.attachEvent('onLiveValidationError', (id, index, value, input, rule) => {
+    console.log('onLiveValidationError', id, index, value, input, rule);
+  });
+  //fires when the mouse pointer is moved over a cell
+  obj.attachEvent('onMouseOver', (id, ind) => {
+    console.log('onMouseOver', id, ind);
+  });
+  //fires on each resize iteration
+  obj.attachEvent('onResize', (cInd, cWidth, obj) => {
+    console.log('onResize', cInd, cWidth, obj);
+  });
+  //fires when resizing of a column is finished
+  obj.attachEvent('onResizeEnd', (obj) => {
+    console.log('onResizeEnd', obj);
+  });
+  //fires immediately after the right mouse button has been clicked on a grid's row
+  obj.attachEvent('onRightClick', (id, ind, obj) => {
+    console.log('onRightClick', id, ind, obj);
+  });
+  //fires right after a row has been added to the grid
+  obj.attachEvent('onRowAdded', (rId) => {
+    console.log('onRowAdded', rId);
+  });
+  //fires when the row is hiding
+  obj.attachEvent('onRowHide', (id, state) => {
+    console.log('onRowHide', id, state);
+  });
+  //fires after the ID of a row has been changed (changeRowId, setRowId, dataprocessor)
+  obj.attachEvent('onRowIdChange', (oldId, newId) => {
+    console.log('onRowIdChange', oldId, newId);
+  });
+  //fires when the row is added to the grid and filled with data
+  obj.attachEvent('onRowInserted', (row, rInd) => {
+    console.log('onRowInserted', row, rInd);
+  });
+  //fires for each row pasted from the clipboard (block selection extension)
+  obj.attachEvent('onRowPaste', (rId) => {
+    console.log('onRowPaste', rId);
+  });
+  //fires immediately after a row in the grid has been clicked
+  obj.attachEvent('onRowSelect', (id, ind) => {
+    console.log('onRowSelect', id, ind);
+  });
+  //fires immediately after scrolling has occured
+  obj.attachEvent('onScroll', (sLeft, sTop) => {
+    console.log('onScroll', sLeft, sTop);
+  });
+  //fires immediately when the selection state has been changed
+  obj.attachEvent('onSelectStateChanged', (id) => {
+    console.log('onSelectStateChanged', id);
+  });
+  //fires after the stat values have been calculated
+  obj.attachEvent('onStatReady', () => {
+    console.log('onStatReady');
+  });
+  //fires when sub-row-ajax cell loads its data
+  obj.attachEvent('onSubAjaxLoad', (id, content) => {
+    console.log('onSubAjaxLoad', id, content);
+  });
+  //fires when the creation of a sub-grid was initialized (can be blocked)
+  obj.attachEvent('onSubGridCreated', (obj, rowId, rowIndex) => {
+    console.log('onSubGridCreated', obj, rowId, rowIndex);
+    return true;
+  });
+  //fires when a sub-row(sub-grid) was opened/closed
+  obj.attachEvent('onSubRowOpen', (id, state) => {
+    console.log('onSubRowOpen', id, state);
+  });
+  //fires when data synchronization is finished
+  obj.attachEvent('onSyncApply', () => {
+    console.log('onSyncApply');
+  });
+  //fires during the tabulation in the grid, blockable
+  obj.attachEvent('onTab', (mode) => {
+    console.log('onTab', mode);
+  });
+  //fires when the grid was ungrouped
+  obj.attachEvent('onUnGroup', () => {
+    console.log('onUnGroup');
+  });
+  //fires when validation runs successfully
+  obj.attachEvent('onValidationCorrect', (id,index,value,rule) => {
+    console.log('onValidationCorrect', id,index,value,rule);
+  });
+  //fires when validation runs and rules execution are failed
+  obj.attachEvent('onValidationError', (id,index,value,rule) => {
+    console.log('onValidationError', id,index,value,rule);
+  });
+}
+```
+Then include the file for loading
+
+`public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="//cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+  <script src="//cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <script type="text/javascript" src="dhx-fetch-dp.js"></script><!--include before-->
+  <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>
+```
+
+And call the event bindings
+
+`public/app.js`
+
+```javascript
+// ...
+contactsGrid = contactsLayout.cells("a").attachGrid();
+contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
+  contactsGrid.selectRow(0, true);
+}, "json");
+
+attachDp(contactsGrid);
+// attach form
+contactsGrid.attachEvent("onRowSelect", contactsFillForm);
+contactsGrid.attachEvent("onRowInserted", contactsGridBold);
+// ...
+```
+
+![Screenshot of the events in console](tutorial_images/Screenshot_20180606_141400.png)
+
+Now you can click on rows, press tab/enter/shift-tab/arrow-keys, move headings, rightclick and you see the events fire in the console window.
+
+Looking at the events, the `onEditCell` looks like the most suitable for the PUT request.
+
+```javascript
+//fires 1-3 times depending on cell's editability (see the stage parameter)
+obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
+  //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
+  const beforeStart = 0;
+  const editorOpened = 1;
+  const editorClosed = 2;
+
+  if (stage === editorClosed & newValue !== oldValue) {
+    let fieldName = obj.getColumnId(colIndex);
+    let request = `{"${fieldName}":"${newValue}"}`;
+    console.log('request',  JSON.parse(request));
+    fetch(`/api/contacts/${rowId}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT',
+      body: request
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log('response', response);
+      })
+      .catch(err => { console.error(err) });
+
+    return true;
+  }
+});
+```
+
+Also you need to change `api/contacts/contacts-controller.js` to allow editing `ro` to `ed`
+
+```javascript
+  let _head = [
+    { "id": "photo", "width": "65", "type": "ro", "align": "center", "sort": "na", "value": "<span style='padding-left:60px;'>Name</span>" },
+    { "id": "name", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "#cspan" },
+    { "id": "dob", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Date of Birth" },
+    { "id": "pos", "width": "130", "type": "ed", "align": "left", "sort": "na", "value": "Position" },
+    { "id": "email", "width": "170", "type": "ed", "align": "left", "sort": "na", "value": "E-mail Address" },
+    { "id": "phone", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Phone" },
+    { "id": "company", "width": "150", "type": "ed", "align": "left", "sort": "na", "value": "Company" },
+    { "id": "info", "width": "*", "type": "ed", "align": "left", "sort": "na", "value": "Additional" }
+  ];
+```
+And you need to set the editEvents in `public/app.js`
+
+```javascript
+// attach grid
+contactsGrid = contactsLayout.cells("a").attachGrid();
+contactsGrid.enableEditEvents(true,true,true);
+contactsGrid.init();
+```
+
+Note to above:
+
+- [ ] There is no proper error handling (yet), it just assumes it works always.
+- [ ] The dataprocessor is now linked to a specific API-url, no no reuse for other grids or object (yet)
+- [ ] The dataprocessor assumes it is linked to a grid
+
+Let's have a look at the result;
+
+![Application showing the request and the response in the console when updating any field in the contactsGrid](tutorial_images/Screenshot_20180607_101650.png)
+
+### Form
+
+Next up is the form. Let's do the same and connect all the events in a different js script
+
+- rename `dhx-fetch-dp.js` to `dhx-fetch-dp-grid.js`
+- create a new file `dhx-fetch-dp-form.js`
+- include both files in `index.html`
+- add another argument (`objectName`) of the function and rename the function in `dhx-fetch-dp-grid.js`, also prefix the `console.log()` with `objectName` using search/replace, or get it from the branch
+
+`public/dhx-fetch-dp-grid.js`
+
+```javascript
+function attachDpGrid(obj, objectName) {
+  //fires after a row has been deleted from the grid
+  obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+    console.log(objectName, 'onAfterRowDeleted', id, pid);
+  });
+// ...
+```
+
+`public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="//cdn.dhtmlx.com/edge/skins/web/dhtmlx.css">
+  <script src="//cdn.dhtmlx.com/edge/dhtmlx.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <script type="text/javascript" src="dhx-fetch-dp-grid.js"></script>
+  <script type="text/javascript" src="dhx-fetch-dp-form.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>
+```
+`public/dhx-fetch-dp-form.js`
+
+```javascript
+function attachDpForm(obj, objectName) {
+  // onAfterReset	fires after resetting the form
+  obj.attachEvent('onAfterReset', (formId) => {
+    console.log(objectName, 'onAfterReset', formId);
+  });
+  // onAfterSave	fires after data has been saved in DB
+  obj.attachEvent('onAfterSave', (formId, response) => {
+    console.log(objectName, 'onAfterSave', formId, response);
+  });
+  // onAfterValidate	fires after the validation
+  obj.attachEvent('onAfterValidate', (success) => {
+    console.log(objectName, 'onAfterValidate', success);
+  });
+  // onBeforeChange	fires before the data in some input changed ( by user actions )
+  obj.attachEvent('onBeforeChange', (itemName, oldValue, newValue) => {
+    console.log(objectName, 'onBeforeChange', itemName, oldValue, newValue);
+    return true;
+  });
+  // onBeforeClear	fires before the user clears the list of files to upload (clicks the button )
+  obj.attachEvent('onBeforeClear', () => {
+    console.log(objectName, 'onBeforeClear');
+    return true;
+  });
+  // onBeforeDataLoad	fires after the data for the form received, but before it's assigned to actual fields
+  obj.attachEvent('onBeforeDataLoad', (formId, values) => {
+    console.log(objectName, 'onBeforeDataLoad', formId, values);
+    return true;
+  });
+  // onBeforeFileAdd	fires when the user adds a file to the upload queue
+  obj.attachEvent('onBeforeFileAdd', (fileName) => {
+    console.log(objectName, 'onBeforeFileAdd', fileName);
+    return true;
+  });
+  // onBeforeFileRemove	fires before the user removes a single file from the list of files to upload (clicks the button )
+  obj.attachEvent('onBeforeFileRemove', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onBeforeFileRemove', clientFileName, serverFileName);
+    return true;
+  });
+  // onBeforeFileUpload	fires before file uploading has started
+  obj.attachEvent('onBeforeFileUpload', (mode, loader, formData) => {
+    console.log(objectName, 'onBeforeFileUpload', mode, loader, formData);
+    return true;
+  });
+  // onBeforeReset	fires before resetting the form
+  obj.attachEvent('onBeforeReset', (formId, values) => {
+    console.log(objectName, 'onBeforeReset', formId, values);
+    return true;
+  });
+  // onBeforeSave	fires before saving the form
+  obj.attachEvent('onBeforeSave', (formId, values) => {
+    console.log(objectName, 'onBeforeSave', formId, values);
+    return true;
+  });
+  // onBeforeValidate	fires when validation has started but is not applied yet
+  obj.attachEvent('onBeforeValidate', (formId) => {
+    console.log(objectName, 'onBeforeValidate', formId);
+    return true;
+  });
+  // onBlur	fires when the user moves the mouse pointer out of the input
+  obj.attachEvent('onBlur', (itemName, value) => {
+    // value: item value (for checkboxes and radios only)
+    console.log(objectName, 'onBlur', itemName, value);
+  });
+  // onButtonClick	fires when the user clicks a button
+  obj.attachEvent('onButtonClick', (itemName) => {
+    console.log(objectName, 'onButtonClick', itemName);
+  });
+  // onChange	fires when data in some input was changed
+  obj.attachEvent('onChange', (itemName, value, state) => {
+    //state = checked/unchecked (for checkboxes and radios only)
+    console.log(objectName, 'onChange', itemName, value, state);
+  });
+  // onClear	when the user clears the list of files to upload (clicks on button )
+  obj.attachEvent('onClear', () => {
+    console.log(objectName, 'onClear');
+  });
+  // onDisable	fires when the container is disabled after being enabled
+  obj.attachEvent('onDisable', (itemName) => {
+    console.log(objectName, 'onDisable', itemName);
+  });
+  // onEditorAccess	fires when the user accesses the editor body
+  obj.attachEvent('onEditorAccess', (name, type, event, editor, form) => {
+    // name	string	the item's name
+    // type	string	the type of the accessing action (e.g. "mousedown","focus","mouseup","click", "blur")
+    // ev	object	the event object
+    // editor	object	the editor instance
+    // form	object	the form instance
+    console.log(objectName, 'onEditorAccess', name, type, event, editor, form);
+  });
+  // onEditorToolbarClick	fires when the user clicks the editor toolbar
+  obj.attachEvent('onEditorToolbarClick', (name, toolbarId, editor, form) => {
+    console.log(objectName, 'onEditorToolbarClick', name, toolbarId, editor, form);
+  });
+  // onEnable	fires when the container control is enabled after being disabled
+  obj.attachEvent('onEnable', (itemName) => {
+    console.log(objectName, 'onEnable', itemName);
+  });
+  // onEnter	fires on pressing the Enter button when the mouse pointer is set in an input control
+  obj.attachEvent('onEnter', (itemName) => {
+    console.log(objectName, 'onEnter', itemName);
+  });
+  // onFileAdd	fires when the user adds a file to the upload queue
+  obj.attachEvent('onFileAdd', (fileName) => {
+    console.log(objectName, 'onFileAdd', fileName);
+  });
+  // onFileRemove	fires when the user removes single file from the list of files to upload (clicks the button )
+  obj.attachEvent('onFileRemove', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onFileRemove', clientFileName, serverFileName);
+  });
+  // onFocus	fires when an input gets focus
+  obj.attachEvent('onFocus', (itemName, value) => {
+    // value: item value (for checkboxes and radios only)
+    console.log(objectName, 'onFocus', itemName, value);
+  });
+  // onImageUploadFail	fires when an image was uploaded incorrectly
+  obj.attachEvent('onImageUploadFail', (itemName, extra) => {
+    console.log(objectName, 'onImageUploadFail', itemName, extra);
+  });
+  // onImageUploadSuccess	fires when an image was uploaded correctly
+  obj.attachEvent('onImageUploadSuccess', (itemName, imageName, extra) => {
+    console.log(objectName, 'onImageUploadSuccess', itemName, imageName, extra);
+  });
+  // onInfo	fires when the user clicks the Info icon
+  obj.attachEvent('onInfo', (itemName, event) => {
+    console.log(objectName, 'onInfo', itemName, event);
+  });
+  // onInputChange	fires when data in an input was changed and the cursor is still in this input
+  obj.attachEvent('onInputChange', (itemName, value, form) => {
+    console.log(objectName, 'onInputChange', itemName, value, form);
+  });
+  // onKeydown	fires when the native "onkeydown" event is triggered
+  obj.attachEvent('onKeydown', (inputElement, eventObject, itemName, value) => {
+    console.log(objectName, 'onKeydown', inputElement, eventObject, itemName, value);
+  });
+  // onKeyup	fires when the native "onkeyup" event is triggered
+  obj.attachEvent('onKeyup', (inputElement, eventObject, itemName, value) => {
+    console.log(objectName, 'onKeyup', inputElement, eventObject, itemName, value);
+  });
+  // onOptionsLoaded	fires after the item options were completely loaded from the server to the client
+  obj.attachEvent('onOptionsLoaded', (itemName) => {
+    console.log(objectName, 'onOptionsLoaded', itemName);
+  });
+  // onUploadCancel	fires when the user cancels uploading of a file (clicks the button ).
+  obj.attachEvent('onUploadCancel', (fileName) => {
+    console.log(objectName, 'onUploadCancel', fileName);
+  });
+  // onUploadComplete	fires when all files from the list have been uploaded to the server
+  obj.attachEvent('onUploadComplete', (count) => {
+    console.log(objectName, 'onUploadComplete', count);
+  });
+  // onUploadFail	fires when the file upload has failed
+  obj.attachEvent('onUploadFail', (fileName) => {
+    //fileName the real name of the file (as it's displayed in the control)
+    console.log(objectName, 'onUploadFail', fileName);
+  });
+  // onUploadFile	fires when a single file from the list has been uploaded to the server
+  obj.attachEvent('onUploadFile', (clientFileName, serverFileName) => {
+    console.log(objectName, 'onUploadFile', clientFileName, serverFileName);
+  });
+  // onValidateError	fires for each error during validation
+  obj.attachEvent('onValidateError', (name, value, result) => {
+    console.log(objectName, 'onValidateError', name, value, result);
+  });
+  // onValidateSuccess	fires for each success during validation
+  obj.attachEvent('onValidateSuccess', (name, value, result) => {
+    console.log(objectName, 'onValidateSuccess', name, value, result);
+  });
+  // onXLE	fires when the data loading is finished and a component or data is rendered
+  obj.attachEvent('onXLE', () => {
+    //callback order: onXLS event => [request] => onXLE event => doOnLoad()
+    console.log(objectName, 'onXLE');
+  });
+  // onXLS	fires when XML loading started
+  obj.attachEvent('onXLS', () => {
+    //callback order: onXLS event => [request] => onXLE event => doOnLoad()
+    console.log(objectName, 'onXLS');
+  });
+}
+```
+
+update our main app so it binds the events
+
+`public/app.js`
+
+```javascript
+//...
+function contactsInit(cell) {
+  if (contactsLayout == null) {
+    // init layout
+    contactsLayout = cell.attachLayout("2U");
+    contactsLayout.cells("a").hideHeader();
+    contactsLayout.cells("b").hideHeader();
+    contactsLayout.cells("b").setWidth(330);
+    contactsLayout.cells("b").fixSize(true, true);
+    contactsLayout.setAutoSize("a", "a;b");
+
+    // attach grid
+    contactsGrid = contactsLayout.cells("a").attachGrid();
+    contactsGrid.enableEditEvents(true,true,true);
+    contactsGrid.init();
+    contactsGrid.load("api/contacts?type=" + A.deviceType, function () {
+      contactsGrid.selectRow(0, true);
+    }, "json");
+
+    attachDpGrid(contactsGrid, 'contactsGrid'); // <<<<
+
+    // attach form
+    contactsGrid.attachEvent("onRowSelect", contactsFillForm);
+    contactsGrid.attachEvent("onRowInserted", contactsGridBold);
+
+    contactsForm = contactsLayout.cells("b").attachForm([
+      { type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 },
+      { type: "container", name: "photo", label: "", inputWidth: 160, inputHeight: 160, offsetTop: 20, offsetLeft: 65 },
+      { type: "input", name: "name", label: "Name", offsetTop: 20 },
+      { type: "input", name: "email", label: "E-mail" },
+      { type: "input", name: "phone", label: "Phone" },
+      { type: "input", name: "company", label: "Company" },
+      { type: "input", name: "info", label: "Additional info" }
+    ]);
+    attachDpForm(contactsForm, 'contactsForm'); // <<<<
+    contactsForm.setSizes = contactsForm.centerForm;
+    contactsForm.setSizes();
+  }
+}
+//...
+```
+![Form events showing in the console](tutorial_images/Screenshot_20180607_153040.png)
+
+Looking at the events, the `onChange` seems the most suitable to fire a request to the API.
+
+This is what we have to do;
+
+- [ ] get all data to be send
+- [ ] send the data
+- [ ] sync with the grid 
+
+Getting the `rowId` is not that hard: 
+
+```javascript
+obj.getItemValue('id');
+```
+
+Sending the request is the same as in the grid, but then we have a problem; how are we going to communicate back to grid within this function? Let me try to see if we can create a custom event:
+
+```javascript
+obj.callEvent("onAfterChange", [rowId, itemName, value]);
+```
+So in the script:
+
+`public/dhx-fetch-dp-form.js`
+
+```javascript
+// onChange	fires when data in some input was changed
+obj.attachEvent('onChange', (itemName, value, state) => {
+  //state = checked/unchecked (for checkboxes and radios only)
+  console.log(objectName, 'onChange', itemName, value, state);
+  let rowId = obj.getItemValue('id');
+  let request = `{"${itemName}":"${value}"}`;
+  console.log(objectName, 'request', JSON.parse(request), rowId);
+  fetch(`/api/contacts/${rowId}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'PUT',
+    body: request
+  })
+    .then(response => response.json())
+    .then(response => {
+      console.log(objectName, 'response', response);
+      // call a custom event, onAfterChange doesn't exist
+      obj.callEvent("onAfterChange", [rowId, itemName, value]);
+    })
+    .catch(err => { console.error(err) });
+});
+```
+
+If that is possible we can easily 'catch' it again in the app.js, where all items are spaghetti-coded anyway:
+
+`pubilc/app.js`
+
+```javascript
+contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
+  fieldIndex = contactsGrid.getColIndexById(field);
+  console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
+  contactsGrid.cells(rowId, fieldIndex).setValue(value);
+});
+```
+
+What do you know, it works. You cn check it out at [Brach Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
+
+![Screenshot of updating the form: connected to the grid](tutorial_images/Screenshot_20180607_162339.png)
 
 # References
 

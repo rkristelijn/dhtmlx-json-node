@@ -1647,9 +1647,11 @@ What do you know, it works. You can check it out at [Brach Step4e](https://githu
 
 We take the same approach as the previous step (which is, design top-down, build bottom-up):
 
-- [ ] create the API and test it
-- [ ] connect the toolbar button
-- [ ] complete interaction with the grid
+- [x] create the API and test it
+- [x] connect the toolbar button
+- [x] complete interaction with the grid
+
+You can see/clone the result of this chapter on [Branch Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4d) (sorry, messed up right order, but the hyperlink is right)
 
 `api/contacts/contacts-controller.js`
 
@@ -1688,7 +1690,7 @@ Test using postman, payload:
 
 ```json
 {
-	"photo": "<img src='imgs/contacts/small/remi-kristelijn.jpg' border='0' class='contact_photo'>",
+	"photo": "<img src='imgs/contacts/small/remi-kristelijn.jpg' border='0' class='contact_photo' height='40' width='40'>",
 	"name": "Remi Kristelijn",
 	"dob": "12/17/1079",
 	"pos": "Enterprise Architect",
@@ -1706,6 +1708,116 @@ Connected to mongoose
 Mongoose: contacts.insertOne({ _id: ObjectId("5b1a36c201c7e91842e32afc"), photo: '<img src=\'imgs/contacts/small/remi-kristelijn.jpg\' border=\'0\' class=\'contact_photo\'>', name: 'Remi Kristelijn', dob: '12/17/1079', pos: 'Enterprise Architect', email: 'rkristelijn@mail.com', phone: '1-842-458-1452', company: 'Accenture', created: new Date("Fri, 08 Jun 2018 07:56:50 GMT"), __v: 0 })
 POST / 200 43ms
 ```
+
+Now let's connect that to the button;
+
+First I tried to add an event within the initialization of the contacts layout in function`contactsInit()`. I also added one in the `projectsInit()` like the one below.
+
+`public/app.js`
+
+```javascript
+contactsInit(cell) { 
+  // ...
+  mainToolbar.attachEvent("onClick", (buttonId) => {
+    console.log("mainToolbar/contact", "onClick", buttonId);
+  });
+  // ...
+}
+
+projectsInit(cell) {
+  // ...
+  mainToolbar.attachEvent("onClick", (buttonId) => {
+    console.log("mainToolbar/contact", "onClick", buttonId);
+  });
+  // ...
+}
+```
+
+However when switching to projects and back, clicking the button resulted in both events fireing. So I needed to filter out to fire only when contacts was selected.
+
+`public/app.js`
+
+```javascript
+contactsInit(cell) { 
+  // ...
+  mainToolbar.attachEvent("onClick", (buttonId) => {
+    if(mainSidebar.getActiveItem() === 'contacts') {
+        console.log("mainToolbar/contact", "onClick", buttonId);
+        let rowId = contactsGrid.uid();
+        contactsGrid.addRow(rowId, "");
+        contactsGrid.selectRowById(rowId);
+      }
+  });
+  // ...
+}
+
+projectsInit(cell) {
+  // ...
+  mainToolbar.attachEvent("onClick", (buttonId) => {
+    if(mainSidebar.getActiveItem() === 'projects') {
+      console.log("mainToolbar/contact", "onClick", buttonId);
+    }
+  });
+  // ...
+}
+```
+Now let's connect the API call.
+
+`/public/dhx-fetch-dp-grid.js`
+
+```javascript
+//fires right after a row has been added to the grid
+  obj.attachEvent('onRowAdded', (rId) => {
+    console.log(objectName, 'onRowAdded', rId);
+    fetch(`/api/contacts/`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log(objectName, 'response', response);
+
+        /* NOTE: we need to replace the dhx-created (temporarely) rowId with the server row-id */
+        obj.callEvent("onAfterRowAdded", [rId, response._id]);
+      })
+      .catch(err => { console.error(err) });
+  });
+```
+
+As you can see we need another event to do something after the creation in the database. So we fire a custom event: `onAfterRowAdded` and catch that again in `app.js`
+
+`public/app.js`
+
+```javascript
+contactsInit(cell) { 
+  // ...
+  contactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId) => {
+      console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId);
+      contactsGrid.changeRowId(tempRowId, serverRowId);
+    });
+  // ...
+}
+```
+
+Now there one thing that is impossible to populate now, the avatar image. Let's predefault that in the model.
+
+`/api/contacts/contacts-model.js`
+
+```javascript
+const ContactsSchema = mongoose.Schema({
+  // ...
+  photo: {
+    type: String,
+    default: "<img src='imgs/contacts/small/some-one.png' border='0' class='contact_photo' height='40' width='40'>"
+  },
+  // ...
+});
+```
+Now we can add new contacts.
+
+![Screenshot of the app, being able to add and update contacts](tutorial_images/Screenshot_20180608_120538.png)
 
 # References
 

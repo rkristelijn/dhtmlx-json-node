@@ -27,6 +27,13 @@ let contactsController = (Model) => {
     });
   };
 
+  let _createOne = (data, callback) => {
+    Model.create(data, (err, contact) => {
+      if (err) callback(err, null);
+      else callback(null, contact);
+    });
+  };
+
   // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}
   let _toRows = (rows) => {
     let result = [];
@@ -41,7 +48,8 @@ let contactsController = (Model) => {
   // revealing model pattern, not revealing _toRows()
   return {
     readAll: _readAll,
-    updateOne: _updateOne
+    updateOne: _updateOne,
+    createOne: _createOne
   };
 }
 

@@ -27,8 +27,8 @@ This tutorial follows my development step by step using git branches. Every chap
   - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
-    - [ ] [PUT for updates](#step-4e-put-for-updates)
-    - [ ] POST for create
+    - [x] [PUT for updates](#step-4e-put-for-updates) for the grid and the from
+    - [ ] [POST for create](#step-4d-post-for-create)
     - [ ] DELETE for delete
 
   - [References](#references)
@@ -1637,9 +1637,75 @@ contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
 });
 ```
 
-What do you know, it works. You cn check it out at [Brach Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
+What do you know, it works. You can check it out at [Brach Step4e](https://github.com/rkristelijn/dhtmlx-json-node/tree/Step4e)
 
 ![Screenshot of updating the form: connected to the grid](tutorial_images/Screenshot_20180607_162339.png)
+
+## Step 4d: POST for create
+
+[back to top](#plan)
+
+We take the same approach as the previous step (which is, design top-down, build bottom-up):
+
+- [ ] create the API and test it
+- [ ] connect the toolbar button
+- [ ] complete interaction with the grid
+
+`api/contacts/contacts-controller.js`
+
+```javascript
+//add following function
+let _createOne = (data, callback) => {
+  Model.create(data, (err, contact) => {
+    if (err) callback(err, null);
+    else callback(null, contact);
+  });
+};
+//...
+// revealing model pattern, not revealing _toRows()
+return {
+  readAll: _readAll,
+  updateOne: _updateOne,
+  createOne: _createOne // <<<< add this line
+};
+```
+
+`api/contacts/contacts-router.js`
+
+```javascript
+//add following function
+contactsRouter.post('/', (req, res) => {
+  contactsController.createOne(req.body, (err, contact) => {
+    if(err) {
+      res.sendStatus(400).end(err);
+    } else {
+      res.json(contact);
+    }
+  });
+});
+```
+Test using postman, payload:
+
+```json
+{
+	"photo": "<img src='imgs/contacts/small/remi-kristelijn.jpg' border='0' class='contact_photo'>",
+	"name": "Remi Kristelijn",
+	"dob": "12/17/1079",
+	"pos": "Enterprise Architect",
+	"email": "rkristelijn@mail.com",
+	"phone":"1-842-458-1452",
+	"company":"Accenture"
+}
+```
+
+![Postman showing POST method](tutorial_images/Screenshot_20180608_095753.png)
+
+```bash
+listening on *:3000
+Connected to mongoose
+Mongoose: contacts.insertOne({ _id: ObjectId("5b1a36c201c7e91842e32afc"), photo: '<img src=\'imgs/contacts/small/remi-kristelijn.jpg\' border=\'0\' class=\'contact_photo\'>', name: 'Remi Kristelijn', dob: '12/17/1079', pos: 'Enterprise Architect', email: 'rkristelijn@mail.com', phone: '1-842-458-1452', company: 'Accenture', created: new Date("Fri, 08 Jun 2018 07:56:50 GMT"), __v: 0 })
+POST / 200 43ms
+```
 
 # References
 

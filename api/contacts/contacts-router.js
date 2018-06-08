@@ -14,12 +14,21 @@ let routes = () => {
         res.json(contacts);
       }
     });
-
   });
 
   contactsRouter.put('/:id', (req, res) => {
     contactsController.updateOne(req.params.id, req.body, (err, contact) => {
       if (err) {
+        res.sendStatus(400).end(err);
+      } else {
+        res.json(contact);
+      }
+    });
+  });
+
+  contactsRouter.post('/', (req, res) => {
+    contactsController.createOne(req.body, (err, contact) => {
+      if(err) {
         res.sendStatus(400).end(err);
       } else {
         res.json(contact);

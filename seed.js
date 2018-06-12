@@ -9,4 +9,9 @@ db.once('open', () => {
   console.log('Connected to mongoose');
 });
 
+db.dropDatabase();
+
 require('./api/contacts/contacts-seed.js');
+require('./api/projects/projects-seed.js');
+
+console.log(`press CTRL+C to exit`);

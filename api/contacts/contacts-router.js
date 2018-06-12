@@ -31,7 +31,7 @@ let routes = () => {
       if (err) {
         res.sendStatus(400).end(err);
       } else {
-        res.sendStatus(201).json(contact);
+        res.json(contact);
       }
     });
   });

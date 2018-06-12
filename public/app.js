@@ -125,7 +125,8 @@ function contactsInit(cell) {
       contactsGrid.selectRow(0, true);
     }, "json");
 
-    attachDpGrid(contactsGrid, 'contactsGrid');
+    // attach custom data processor
+    attachDpGrid(contactsGrid, 'contactsGrid', '/api/contacts/');
 
     // attach form
     contactsGrid.attachEvent("onRowSelect", contactsFillForm);
@@ -141,19 +142,25 @@ function contactsInit(cell) {
       { type: "input", name: "info", label: "Additional info" },
       { type: "input", name: "id", label: "RowId", attributes: ["readonly"], readonly: true }
     ]);
-    attachDpForm(contactsForm, 'contactsForm');
+
+    // attach custom data processor
+    attachDpForm(contactsForm, 'contactsForm', '/api/contacts/');
     contactsForm.setSizes = contactsForm.centerForm;
     contactsForm.setSizes();
 
+    // attach custom event after change
     contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
       fieldIndex = contactsGrid.getColIndexById(field);
       console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
       contactsGrid.cells(rowId, fieldIndex).setValue(value);
     });
 
-    contactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId) => {
-      console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId);
+    // attach custom event after added
+    contactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId, values) => {
+      console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId, values);
       contactsGrid.changeRowId(tempRowId, serverRowId);
+      //pre-defaults, if any
+      contactsGrid.cells(serverRowId, 0).setValue(values.photo);
     });
 
     mainToolbar.attachEvent("onClick", (buttonId) => {
@@ -206,6 +213,7 @@ function projectsInit(cell) {
 
     // attach grid
     projectsGrid = projectsLayout.cells("a").attachGrid();
+    projectsGrid.enableEditEvents(true, true, true);
     projectsGrid.load("api/projects?type=" + A.deviceType, function () {
       projectsGrid.selectRow(0, true);
     }, "json");
@@ -236,9 +244,46 @@ function projectsInit(cell) {
       ]
     });
 
+    // connect the api
+    attachDpGrid(projectsGrid, 'projectsGrid', '/api/projects/');
+    attachDpForm(projectsForm, 'projectsForm', '/api/projects/');
+
+    // attach custom event after change
+    projectsForm.attachEvent("onAfterChange", (rowId, field, value) => {
+      fieldIndex = projectsGrid.getColIndexById(field);
+      console.log('projectsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
+      projectsGrid.cells(rowId, fieldIndex).setValue(value);
+    });
+
+    // attach custom event after added
+    projectsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId, values) => {
+      console.log('projectsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId, values);
+      projectsGrid.changeRowId(tempRowId, serverRowId);
+    });
+
+    // connect the events on the tabbar
     mainToolbar.attachEvent("onClick", (buttonId) => {
       if (mainSidebar.getActiveItem() === 'projects') {
         console.log("mainToolbar/projects", "onClick", buttonId);
+        let rowId;
+        switch (buttonId) {
+          case "add":
+            rowId = projectsGrid.uid();
+            projectsGrid.addRow(rowId, "");
+            projectsGrid.selectRowById(rowId);
+            break;
+          case "del":
+            rowId = projectsGrid.getSelectedRowId();
+            let rowIndex = projectsGrid.getRowIndex(rowId);
+            projectsGrid.deleteRow(rowId);
+            // highlight the next record, or the previous record when deleting the last line
+            if (rowIndex < projectsGrid.getRowsNum()) {
+              projectsGrid.selectRow(rowIndex, true);
+            } else {
+              projectsGrid.selectRow(rowIndex - 1, true)
+            }
+            break;
+        }
       }
     });
   }

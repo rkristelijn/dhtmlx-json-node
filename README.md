@@ -26,7 +26,7 @@ This tutorial follows my development step by step using git branches. Every chap
   - [x] [Step1: Create static html page in Node](#step-1-static-node-web-server)
   - [x] [Step2: Get dhx up and running](#step-2-get-dhx-up-and-running)
   - [x] [Step3: Initialize the layout, grid and form with static data](#step-3-initialize-the-layout-grid-and-form-with-static-data)
-    - [ ] Step3a: Improve code
+    - [x] Step3a: Improve code
       - [x] [Step3a1: Fix xml to json](#step-3-a-change-xml-to-json)
     - [x] Use streamable technology
   - [x] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)

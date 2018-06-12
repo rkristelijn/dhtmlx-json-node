@@ -28,17 +28,20 @@ This tutorial follows my development step by step using git branches. Every chap
   - [x] [Step3: Initialize the layout, grid and form with static data](#step-3-initialize-the-layout-grid-and-form-with-static-data)
     - [ ] Step3a: Improve code
       - [x] [Step3a1: Fix xml to json](#step-3-a-change-xml-to-json)
-      - [ ] Step3ax: Remove statics from code
-    - [ ] Remove globals
-    - [ ] Use streamable technology (fetch?)
-    - [ ] Write some tests
-  - [ ] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
+    - [x] Use streamable technology
+  - [x] [Step4: Create and connect REST API](#step-4-create-and-connect-rest-api)
     - [x] GET using statics for [contacts](#step-4-create-and-connect-rest-api), [projects](#step-4b-set-up-get-for-projects-with-a-static-file), [events and settings](#step-4c-events-and-settings).
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
     - [x] [PUT for updates](#step-4e-put-for-updates) for the grid and the from
     - [x] [POST for create](#step-4d-post-for-create)
-    - [ ] [DELETE for delete](#step-4f-delete-for-delete)
+    - [x] [DELETE for delete](#step-4f-delete-for-delete)
 
+Not part of tutorial
+
+  - [ ] Connect other views
+  - [ ] Clean up code
+  - [ ] Optimize dataprocessor (merge?)
+  - [ ] Optimize front-end (vue.js?)
   - [References](#references)
 
 # Step 1: Static node web server
@@ -1829,9 +1832,89 @@ Now we can add new contacts.
 
 ## Step 4f: DELETE for delete
 
+[back to top](#plan)
+
 `api/contacts/contacts-controller.js`
 
+```javascript
+let _deleteOne = (id, callback) => {
+  Model.findByIdAndRemove({ _id: id }, (err) => {
+    if (err) callback(err, null);
+    else callback(null, null);
+  });
+};
+//...
+// revealing model pattern, not revealing _toRows()
+return {
+  readAll: _readAll,
+  updateOne: _updateOne,
+  createOne: _createOne,
+  deleteOne: _deleteOne // <<<<
+};
+// ...
+```
 
+`api/contacts/contacts-router.js`
+
+```javascript
+contactsRouter.delete('/:id', (req, res) => {
+  contactsController.deleteOne(req.params.id, (err) => {
+    if (err) {
+      res.sendStatus(400).end(err);
+    } else {
+      res.sendStatus(204).end(req.params.id + " removed");
+    }
+  });
+});
+```
+
+`public/app.js`
+
+```javascript
+mainToolbar.attachEvent("onClick", (buttonId) => {
+  if (mainSidebar.getActiveItem() === 'contacts') {
+    console.log("mainToolbar/contact", "onClick", buttonId);
+    let rowId;
+    switch (buttonId) {
+      case "add":
+        rowId = contactsGrid.uid();
+        contactsGrid.addRow(rowId, "");
+        contactsGrid.selectRowById(rowId);
+        break;
+      case "del":
+        rowId = contactsGrid.getSelectedRowId();
+        let rowIndex = contactsGrid.getRowIndex(rowId);
+        contactsGrid.deleteRow(rowId);
+        // highlight the next record, or the previous record when deleting the last line
+        if (rowIndex < contactsGrid.getRowsNum()) {
+          contactsGrid.selectRow(rowIndex, true);
+        } else {
+          contactsGrid.selectRow(rowIndex - 1, true)
+        }
+        break;
+    }
+  }
+});
+```
+
+`public/dhx-fetch-dp-grid.js`
+
+```javascript
+//fires after a row has been deleted from the grid
+obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+  console.log(objectName, 'onAfterRowDeleted', id, pid);
+  fetch(`/api/contacts/${id}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'DELETE'
+  })
+    .then(response => {
+      console.log(objectName, 'response', response.statusText);
+    })
+    .catch(err => { console.error(err) });
+});
+```
 
 # References
 

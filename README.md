@@ -38,7 +38,7 @@ This tutorial follows my development step by step using git branches. Every chap
 
 Not part of tutorial
 
-  - [ ] Connect other views
+  - [ ] Connect other views [branch:feature-projects-api](https://github.com/rkristelijn/dhtmlx-json-node/tree/feature-projects-api)
   - [ ] Clean up code
   - [ ] Optimize dataprocessor (merge?)
   - [ ] Optimize front-end (vue.js?)

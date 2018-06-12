@@ -1,17 +1,7 @@
-const mongoose = require('mongoose');
 const Contact = require('./contacts-model');
 const fs = require('fs');
 
-mongoose.connect('mongodb://localhost/cms');
-mongoose.set('debug', true);
-let db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'Mongoose:'));
-db.once('open', () => {
-  console.log('Connected to mongoose');
-});
-
-fs.readFile('./contacts.json', (err, data) => {
+fs.readFile('./api/contacts/contacts.json', (err, data) => {
   if (err) console.log('error', err);
   obj = JSON.parse(data);
   for (contact of obj.rows) {

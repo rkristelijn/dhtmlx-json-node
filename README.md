@@ -2,6 +2,14 @@
 
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
+# Installation
+1. `git clone https://github.com/rkristelijn/dhtmlx-json-node.git`
+2. `cd dhtmlx-json-node`
+3. `npm i`
+4. `npm run seed` / ctrl+c when done
+5. `npm start`
+6. point your browser at `localhost:3000`
+
 ## Prerequisites:
 
 1. latest node and npm

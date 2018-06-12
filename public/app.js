@@ -59,7 +59,10 @@ var mainSidebar;
 var mainToolbar;
 
 function appInit() {
-  mainSidebar = new dhtmlXSideBar({
+  mainSidebar = new dhtmlXSidcontactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId) => {
+    console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId);
+    contactsGrid.changeRowId(tempRowId, serverRowId);
+  });eBar({
     parent: document.body,
     icons_path: "imgs/sidebar/",
     width: 180,

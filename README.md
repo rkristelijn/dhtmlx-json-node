@@ -37,7 +37,7 @@ This tutorial follows my development step by step using git branches. Every chap
     - [x] [GET using data from db](#step-4d-get-using-data-from-db)
     - [x] [PUT for updates](#step-4e-put-for-updates) for the grid and the from
     - [x] [POST for create](#step-4d-post-for-create)
-    - [ ] DELETE for delete
+    - [ ] [DELETE for delete](#step-4f-delete-for-delete)
 
   - [References](#references)
 
@@ -1826,6 +1826,12 @@ const ContactsSchema = mongoose.Schema({
 Now we can add new contacts.
 
 ![Screenshot of the app, being able to add and update contacts](tutorial_images/Screenshot_20180608_120538.png)
+
+## Step 4f: DELETE for delete
+
+`api/contacts/contacts-controller.js`
+
+
 
 # References
 

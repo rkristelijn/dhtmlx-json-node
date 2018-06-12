@@ -2,6 +2,16 @@ function attachDpGrid(obj, objectName) {
   //fires after a row has been deleted from the grid
   obj.attachEvent('onAfterRowDeleted', (id, pid) => {
     console.log(objectName, 'onAfterRowDeleted', id, pid);
+    fetch(`/api/contacts/${id}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'DELETE'
+    })
+      .then(response => {
+        console.log(objectName, 'response', response.statusText);
+      })
+      .catch(err => { console.error(err) });
   });
   //fires when the user starts selecting a block
   obj.attachEvent('onBeforeBlockSelected', (rId, cInd) => {

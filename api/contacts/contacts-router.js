@@ -28,10 +28,20 @@ let routes = () => {
 
   contactsRouter.post('/', (req, res) => {
     contactsController.createOne(req.body, (err, contact) => {
-      if(err) {
+      if (err) {
         res.sendStatus(400).end(err);
       } else {
-        res.json(contact);
+        res.sendStatus(201).json(contact);
+      }
+    });
+  });
+
+  contactsRouter.delete('/:id', (req, res) => {
+    contactsController.deleteOne(req.params.id, (err) => {
+      if (err) {
+        res.sendStatus(400).end(err);
+      } else {
+        res.sendStatus(204).end(req.params.id + " removed");
       }
     });
   });

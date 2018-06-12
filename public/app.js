@@ -230,7 +230,8 @@ function projectsInit(cell) {
       { type: "input", name: "project", label: "Project" },
       { type: "input", name: "status", label: "Status" },
       { type: "input", name: "assign", label: "Assigned to" },
-      { type: "input", name: "info", label: "Additional info" }
+      { type: "input", name: "info", label: "Additional info" },
+      { type: "input", name: "id", label: "RowId", attributes: ["readonly"], readonly: true }
     ]);
     projectsForm.getContainer("photo").innerHTML = "<img src='imgs/projects/project.png' border='0' class='form_photo'>";
     projectsForm.setSizes = projectsForm.centerForm;
@@ -293,6 +294,8 @@ function updateChart(id) {
   if (projectsTabbar.getActiveTab() != "stats") return;
   if (id == null) id = projectsGrid.getSelectedRowId();
   if (id == projectsChartId || id == null) return;
+
+  let name = projectsGrid.cells(id, 1).getValue();
   // init chart
   if (projectsChart == null) {
     projectsChart = projectsTabbar.tabs("stats").attachChart({
@@ -310,7 +313,8 @@ function updateChart(id) {
   } else {
     projectsChart.clearAll();
   }
-  projectsChart.load(A.server + "chart/" + id + ".json?r=" + new Date().getTime(), "json");
+  //projectsChart.load(A.server + "chart/" + id + ".json?r=" + new Date().getTime(), "json");
+  projectsChart.load("api/projects/sales/" + name, "json");
   // remember loaded project
   projectsChartId = id;
 }
@@ -322,6 +326,7 @@ function projectsFillForm(id) {
     var index = projectsGrid.getColIndexById(a);
     if (index != null && index >= 0) data[a] = String(projectsGrid.cells(id, index).getValue()).replace(/\&amp;?/gi, "&");
   }
+  data.id = id;
   projectsForm.setFormData(data);
   // update chart
   updateChart(id);
@@ -639,3 +644,88 @@ function contactsGridBold(r, index) {
 window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
   if (id == "contacts") contactsInit(cell);
 });
+
+/// SERVER EVENTS
+function attachDpForm(obj, objectName, url) {
+  // onChange	fires when data in some input was changed
+  obj.attachEvent('onChange', (itemName, value, state) => {
+    //state = checked/unchecked (for checkboxes and radios only)
+    console.log(objectName, 'onChange', itemName, value, state);
+    let rowId = obj.getItemValue('id');
+    let request = `{"${itemName}":"${value}"}`;
+    console.log(objectName, 'request', JSON.parse(request), rowId);
+    fetch(`${url}${rowId}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT',
+      body: request
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log(objectName, 'response', response);
+        obj.callEvent("onAfterChange", [rowId, itemName, value]);
+      })
+      .catch(err => { console.error(err) });
+  });
+}
+
+function attachDpGrid(obj, objectName, url) {
+  //fires after a row has been deleted from the grid
+  obj.attachEvent('onAfterRowDeleted', (id, pid) => {
+    console.log(objectName, 'onAfterRowDeleted', id, pid);
+    fetch(`${url}${id}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'DELETE'
+    })
+      .then(response => {
+        console.log(objectName, 'response', response.statusText);
+      })
+      .catch(err => { console.error(err) });
+  });
+  //fires 1-3 times depending on cell's editability (see the stage parameter)
+  obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
+    //stage the stage of editing (0-before start; can be canceled if return false,1 - the editor is opened,2- the editor is closed)
+    const beforeStart = 0;
+    const editorOpened = 1;
+    const editorClosed = 2;
+
+    if (stage === editorClosed & newValue !== oldValue) {
+      let fieldName = obj.getColumnId(colIndex);
+      let request = `{"${fieldName}":"${newValue}"}`;
+      console.log(objectName, 'request', JSON.parse(request));
+      fetch(`${url}${rowId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT',
+        body: request
+      })
+        .then(response => response.json())
+        .then(response => {
+          console.log(objectName, 'response', response);
+        })
+        .catch(err => { console.error(err) });
+
+      return true;
+    }
+  });
+  //fires right after a row has been added to the grid
+  obj.attachEvent('onRowAdded', (rId) => {
+    console.log(objectName, 'onRowAdded', rId);
+    fetch(`${url}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log(objectName, 'response', response);
+        obj.callEvent("onAfterRowAdded", [rId, response._id, response]);
+      })
+      .catch(err => { console.error(err) });
+  });
+}

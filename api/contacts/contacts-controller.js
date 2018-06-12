@@ -34,6 +34,13 @@ let contactsController = (Model) => {
     });
   };
 
+  let _deleteOne = (id, callback) => {
+    Model.findByIdAndRemove({ _id: id }, (err) => {
+      if (err) callback(err, null);
+      else callback(null, null);
+    });
+  };
+
   // create {id:x,data:[y,z,...]} from {_id:x,y:'',z:''}
   let _toRows = (rows) => {
     let result = [];
@@ -49,7 +56,8 @@ let contactsController = (Model) => {
   return {
     readAll: _readAll,
     updateOne: _updateOne,
-    createOne: _createOne
+    createOne: _createOne,
+    deleteOne: _deleteOne
   };
 }
 

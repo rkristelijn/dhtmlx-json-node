@@ -59,10 +59,7 @@ var mainSidebar;
 var mainToolbar;
 
 function appInit() {
-  mainSidebar = new dhtmlXSidcontactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId) => {
-    console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId);
-    contactsGrid.changeRowId(tempRowId, serverRowId);
-  });eBar({
+  mainSidebar = new dhtmlXSideBar({
     parent: document.body,
     icons_path: "imgs/sidebar/",
     width: 180,
@@ -82,7 +79,7 @@ function appInit() {
       { type: "text", id: "title", text: "&nbsp;" },
       { type: "spacer" },
       { type: "button", id: "add", img: "add.png" },
-      { type: "button", id: "save", img: "save.png" }
+      { type: "button", id: "del", img: "del.png" }
     ]
   });
 
@@ -160,11 +157,27 @@ function contactsInit(cell) {
     });
 
     mainToolbar.attachEvent("onClick", (buttonId) => {
-      if(mainSidebar.getActiveItem() === 'contacts') {
+      if (mainSidebar.getActiveItem() === 'contacts') {
         console.log("mainToolbar/contact", "onClick", buttonId);
-        let rowId = contactsGrid.uid();
-        contactsGrid.addRow(rowId, "");
-        contactsGrid.selectRowById(rowId);
+        let rowId;
+        switch (buttonId) {
+          case "add":
+            rowId = contactsGrid.uid();
+            contactsGrid.addRow(rowId, "");
+            contactsGrid.selectRowById(rowId);
+            break;
+          case "del":
+            rowId = contactsGrid.getSelectedRowId();
+            let rowIndex = contactsGrid.getRowIndex(rowId);
+            contactsGrid.deleteRow(rowId);
+            // highlight the next record, or the previous record when deleting the last line
+            if (rowIndex < contactsGrid.getRowsNum()) {
+              contactsGrid.selectRow(rowIndex, true);
+            } else {
+              contactsGrid.selectRow(rowIndex - 1, true)
+            }
+            break;
+        }
       }
     });
   }
@@ -224,7 +237,7 @@ function projectsInit(cell) {
     });
 
     mainToolbar.attachEvent("onClick", (buttonId) => {
-      if(mainSidebar.getActiveItem() === 'projects') {
+      if (mainSidebar.getActiveItem() === 'projects') {
         console.log("mainToolbar/projects", "onClick", buttonId);
       }
     });

@@ -1,14 +1,135 @@
 # dhtmlx-json-node
 
+## Introduction
+
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
+# Contents
+- [Motivational speech](#why)
+- [Screenshots](#example)
+- [Comparison](#benchmark)
+- [Installation](#installation)
+- [Tutorial](#tutorial)
+
+---
+
+# Why?
+
+[back to Contents](#contents)
+
+Why you ask? DHTMLX (dhx for short) is a beautiful library to quickly ramp up CMS, CRM, HR, etc systems that are intuitive and complete. Probably you can use alternatives such as angular/vue/react material, but that comes with a full framework. This time I just wanted the simplicity of dhx itself. 
+
+## [DHTMLX](https://docs.dhtmlx.com/index.html) API references:
+
+### Layout 
+
+|[Accordion](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)| [Carousel](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html) | [Layout](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) | [Popup](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html) | [Tabbar](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) | [Windows](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_accordion.png)](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)|[![icon](/tutorial_images/dhx_icons/icon_carousel.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html)|[![icon](/tutorial_images/dhx_icons/icon_layout.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) |[![icon](/tutorial_images/dhx_icons/icon_popup.png)](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html)|[![icon](/tutorial_images/dhx_icons/icon_tabbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) |[![icon](/tutorial_images/dhx_icons/icon_windows.png)](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) 
+
+### Data Components 
+
+|[Chart](https://docs.dhtmlx.com/api__refs__dhtmlchart.html)| [DataView](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html) | [Grid](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) | [List](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html) | [TreeGrid](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) | [TreeView](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_chart.png)](https://docs.dhtmlx.com/api__refs__dhtmlxchart.html)|[![icon](/tutorial_images/dhx_icons/icon_dataview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html)|[![icon](/tutorial_images/dhx_icons/icon_grid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) |[![icon](/tutorial_images/dhx_icons/icon_list.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html)|[![icon](/tutorial_images/dhx_icons/icon_treegrid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) |[![icon](/tutorial_images/dhx_icons/icon_treeview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) 
+
+### Form-oriented Components 
+
+| [Calendar](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)| [ColorPicker](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html) | [Combo](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) | [Editor](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html) | [Form](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) | [Slider](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) 
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_calendar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)|[![icon](/tutorial_images/dhx_icons/icon_colorpicker.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html)|[![icon](/tutorial_images/dhx_icons/icon_combo.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) |[![icon](/tutorial_images/dhx_icons/icon_editor.png)](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html)|[![icon](/tutorial_images/dhx_icons/icon_form.png)](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) |[![icon](/tutorial_images/dhx_icons/icon_slider.png)](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) |
+
+### Navigation Components
+
+| [Menu](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)| [Ribbon](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html) | [Sidebar](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) | [Toolbar](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html) |
+|:-:|:-:|:-:|:-:|
+|[![icon](/tutorial_images/dhx_icons/icon_menu.png)](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)|[![icon](/tutorial_images/dhx_icons/icon_ribbon.png)](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html)|[![icon](/tutorial_images/dhx_icons/icon_sidebar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) |[![icon](/tutorial_images/dhx_icons/icon_toolbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html)
+
+When connecting the back-end to it (in English: make the new, delete button work, and allow updates that stay) I discovered that the default dhtmlxDataProcessor is unpredictable and heavy to use. [@see my other project](https://github.com/rkristelijn/grid-socket-io)
+
+When sending data from the browser, these are the options you have:
+
+- [XMLHttpRequest or XHR](https://blog.garstasio.com/you-dont-need-jquery/ajax/) - old [AJAX (Asynchronous JavaScript And XML)](https://en.wikipedia.org/wiki/Ajax_(programming))
+- [jQuery](https://blog.garstasio.com/you-dont-need-jquery/ajax/)
+- [JSONP](https://en.wikipedia.org/wiki/JSONP)
+- [WebSocket](https://en.wikipedia.org/wiki/WebSocket)
+- [fetch polyfil](https://github.com/github/fetch)
+- [xdomain](https://github.com/jpillora/xdomain)
+
+But now, the replacement of XMLHttpRequest is here: **fetch** and [you can use it out of the box](https://caniuse.com/#feat=fetch)
+
+So, this example uses: 
+- [fetch](https://developers.google.com/web/ilt/pwa/working-with-the-fetch-api) (instead of [dhtmlxDataProcessor](https://docs.dhtmlx.com/dataprocessor__index.html) based on [XMLHttpRequest](https://blog.garstasio.com/you-dont-need-jquery/ajax/)) - make it ready for streaming technology also look at [Jake Archibald's comparison page](https://jakearchibald.com/2015/thats-so-fetch/)
+- [REST (Representational State Transfer](https://en.wikipedia.org/wiki/Representational_state_transfer) [API](https://en.wikipedia.org/wiki/Application_programming_interface) (instead [PHPConnector](https://docs.dhtmlx.com/connector__php__index.html)) leveraging HTTP using GET, POST, PUT, DELETE
+- [Node](https://en.wikipedia.org/wiki/Node.js) (Instead of [PHP](https://en.wikipedia.org/wiki/PHP)), 
+- [JSON](https://en.wikipedia.org/wiki/JSON) (instead of [XML](https://en.wikipedia.org/wiki/XML))
+
+# Example
+
+[back to Contents](#contents)
+
+Below you will find screenshots of the demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) only it runs from my [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) (@see [tutorial to set up](https://github.com/rkristelijn/pi-ci-mean)).
+
+![Screenshot of dhtmlx with a working grid that changes also the form when you click a record](/tutorial_images/Screenshot_20180528_112120.png)
+
+![Screenshot of dhtmlx with the projects tile opened showing a grid, a graph and detail view](/tutorial_images/Screenshot_20180528_112132.png)
+
+![Screenshot of dhtmlx with the event tile opened, showing tiles of events](/tutorial_images/Screenshot_20180528_112143.png)
+
+![Screenshot of dhtmlx with the settings tile opened showing tiles and a form](/tutorial_images/Screenshot_20180528_112153.png)
+
+## Benchmark
+
+[back to Contents](#contents)
+
+### Sample application
+
+- 53 requests
+- 385 KB transferred
+- Finish 5.87s
+- [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded): 337ms
+- Load: 376
+- Location: Internet (San Francisco, California, United States)
+- Full-blown webserver I presume: nginx/1.1.19
+- Static content
+- Uses local dhtmlx.js and dhtmlx.css
+
+![Demo application loaded from cache where possible](/tutorial_images/Screenshot_20180613_131627.png)
+
+### This application
+
+- 34 requests (**17 less**)
+- 81.8 KB transferred (**4,7 times smaller**)
+- Finish 1.08s (**5 times faster**)
+- DOMContentLoaded: n/a
+- Load: n/a
+- Location: LAN
+- Raspberry Pi 3 using Express in Node
+- Data from MongoDB
+- Ability to Edit, Add and Delete
+- Uses [CDN](https://dhtmlx.com/blog/support-updates-dhtmlx-cdn-new-snippet-tool/) to get dhtmlx.js and dhtmlx.css
+
+![This application loading from cache where possible](/tutorial_images/Screenshot_20180613_131906.png)
+
+
 # Installation
+
+[back to Contents](#contents)
+
 1. `git clone https://github.com/rkristelijn/dhtmlx-json-node.git`
 2. `cd dhtmlx-json-node`
 3. `npm i`
 4. `npm run seed` / ctrl+c when done
 5. `npm start`
 6. point your browser at `localhost:3000`
+
+---
+
+# Tutorial
+
+[back to Contents](#contents)
+
+Now follows every single step I took in ramping up my app.
 
 ## Prerequisites:
 
@@ -18,11 +139,14 @@ This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb
 
 You could have a look at setting up such an environment on either a [physical raspberry pi](https://www.linkedin.com/pulse/develop-full-stack-javascript-applications-using-only-remi-kristelijn/) or a [virtual raspberry pi](https://www.linkedin.com/pulse/my-perfect-javascript-developer-set-up-remi-kristelijn/).
 
-In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like lambda's, HTML5, WCAG, OWASP, etc. Also I try to teach only once: the right way. I think it is better to learn things the right way and later discover; 'hey... there is also a old or wrong way'. 
+In this tutorial I consider: less is more, if we can use defaults, we should do it (default: index.html, index.js etc). Only use stuff if and when we need it. I try to follow the latest standards, like [lambdas](https://en.wikipedia.org/wiki/Anonymous_function), [HTML5](https://en.wikipedia.org/wiki/HTML5), [WCAG](https://en.wikipedia.org/wiki/Web_Content_Accessibility_Guidelines), [OWASP](https://en.wikipedia.org/wiki/OWASP), etc. Also I try to teach only once: the right way. I think it is better to learn things the right way and later discover; 'hey... there is also a old or wrong way'. 
 
 This tutorial follows my development step by step using git branches. Every chapter contains a link to the feature branch.
 
 # Plan
+
+[back to Contents](#contents)
+
   - [x] [Step1: Create static html page in Node](#step-1-static-node-web-server)
   - [x] [Step2: Get dhx up and running](#step-2-get-dhx-up-and-running)
   - [x] [Step3: Initialize the layout, grid and form with static data](#step-3-initialize-the-layout-grid-and-form-with-static-data)
@@ -38,10 +162,17 @@ This tutorial follows my development step by step using git branches. Every chap
 
 Not part of tutorial
 
-  - [ ] Connect other views [branch:feature-projects-api](https://github.com/rkristelijn/dhtmlx-json-node/tree/feature-projects-api)
+  - [x] Connect other views [projects](https://github.com/rkristelijn/dhtmlx-json-node/tree/feature-projects-api), [events](https://github.com/rkristelijn/dhtmlx-json-node/tree/feature-events-api) and [settings](https://github.com/rkristelijn/dhtmlx-json-node/tree/feature-settings-api)
   - [ ] Clean up code
-  - [ ] Optimize dataprocessor (merge?)
+    - [ ] big global of the settingsforms can be taken out of the code
+  - [x] Optimize dataProcessor (moved to app.js and reused)
   - [ ] Optimize front-end (vue.js?)
+    - [ ] Enable routes, so when pressing F5 just stays on the same view
+  - [ ] Extend features
+    - [ ] so sales, settings, events can be added, changed and deleted
+    - [ ] dates are datepickers
+    - [ ] multiselects, dropdowns
+  - [ ] implement error handling
   - [References](#references)
 
 # Step 1: Static node web server
@@ -1920,33 +2051,6 @@ obj.attachEvent('onAfterRowDeleted', (id, pid) => {
 
 [back to top](#plan)
 
-## DHTMLX
-
-Most important, the [dhtmlx](https://docs.dhtmlx.com/index.html) API references:
-
-### Layout 
-
-|[Accordion](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)| [Carousel](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html) | [Layout](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) | [Popup](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html) | [Tabbar](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) | [Windows](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) |
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[![icon](/tutorial_images/dhx_icons/icon_accordion.png)](https://docs.dhtmlx.com/api__refs__dhtmlxaccordion.html)|[![icon](/tutorial_images/dhx_icons/icon_carousel.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcarousel.html)|[![icon](/tutorial_images/dhx_icons/icon_layout.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlayout.html) |[![icon](/tutorial_images/dhx_icons/icon_popup.png)](https://docs.dhtmlx.com/api__refs__dhtmlxpopup.html)|[![icon](/tutorial_images/dhx_icons/icon_tabbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtabbar.html) |[![icon](/tutorial_images/dhx_icons/icon_windows.png)](https://docs.dhtmlx.com/api__refs__dhtmlxwindows.html) 
-
-### Data Components 
-
-|[Chart](https://docs.dhtmlx.com/api__refs__dhtmlchart.html)| [DataView](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html) | [Grid](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) | [List](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html) | [TreeGrid](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) | [TreeView](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) |
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[![icon](/tutorial_images/dhx_icons/icon_chart.png)](https://docs.dhtmlx.com/api__refs__dhtmlxchart.html)|[![icon](/tutorial_images/dhx_icons/icon_dataview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxdataview.html)|[![icon](/tutorial_images/dhx_icons/icon_grid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxgrid.html) |[![icon](/tutorial_images/dhx_icons/icon_list.png)](https://docs.dhtmlx.com/api__refs__dhtmlxlist.html)|[![icon](/tutorial_images/dhx_icons/icon_treegrid.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreegrid.html) |[![icon](/tutorial_images/dhx_icons/icon_treeview.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtreeview.html) 
-
-### Form-oriented Components 
-
-| [Calendar](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)| [ColorPicker](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html) | [Combo](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) | [Editor](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html) | [Form](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) | [Slider](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) 
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[![icon](/tutorial_images/dhx_icons/icon_calendar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcalendar.html)|[![icon](/tutorial_images/dhx_icons/icon_colorpicker.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcolorpicker.html)|[![icon](/tutorial_images/dhx_icons/icon_combo.png)](https://docs.dhtmlx.com/api__refs__dhtmlxcombo.html) |[![icon](/tutorial_images/dhx_icons/icon_editor.png)](https://docs.dhtmlx.com/api__refs__dhtmlxeditor.html)|[![icon](/tutorial_images/dhx_icons/icon_form.png)](https://docs.dhtmlx.com/api__refs__dhtmlxform.html) |[![icon](/tutorial_images/dhx_icons/icon_slider.png)](https://docs.dhtmlx.com/api__refs__dhtmlxslider.html) |
-
-### Navigation Components
-
-| [Menu](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)| [Ribbon](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html) | [Sidebar](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) | [Toolbar](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html) |
-|:-:|:-:|:-:|:-:|
-|[![icon](/tutorial_images/dhx_icons/icon_menu.png)](https://docs.dhtmlx.com/api__refs__dhtmlxmenu.html)|[![icon](/tutorial_images/dhx_icons/icon_ribbon.png)](https://docs.dhtmlx.com/api__refs__dhtmlxribbon.html)|[![icon](/tutorial_images/dhx_icons/icon_sidebar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxsidebar.html) |[![icon](/tutorial_images/dhx_icons/icon_toolbar.png)](https://docs.dhtmlx.com/api__refs__dhtmlxtoolbar.html)
 
 ## Markdown
 

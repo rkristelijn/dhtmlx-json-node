@@ -1,11 +1,20 @@
 const express = require('express');
+const eventsModel = require('./events-model');
+const eventsController = require('./events-controller')(eventsModel);
 
 let routes = () => {
   let eventsRouter = express.Router();
 
-  eventsRouter.get('/', (req, res) => {
-    res.sendFile(__dirname + '/events.json');
-  });
+  eventsRouter.route('/')
+    .get((req, res) => {
+      eventsController.readAll((err, objects) => {
+        if (err) {
+          res.sendStatus(400).end(err);
+        } else {
+          res.json(objects);
+        }
+      });
+    });
 
   return eventsRouter;
 }

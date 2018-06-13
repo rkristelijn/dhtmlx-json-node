@@ -14,5 +14,6 @@ db.dropDatabase();
 require('./api/contacts/contacts-seed.js');
 require('./api/projects/projects-seed.js');
 require('./api/events/events-seed.js');
+require('./api/settings/settings-seed.js');
 
 console.log(`press CTRL+C to exit`);

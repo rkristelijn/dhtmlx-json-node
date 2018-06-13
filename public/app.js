@@ -6,14 +6,14 @@ dhtmlXForm.prototype.centerForm = function () {
   this.cont.style.marginLeft = "0px";
   this.cont.style.marginBottom = "20px";
   this.cont.style.width = "100%";
-  var w1 = this.cont.offsetWidth;
+  let w1 = this.cont.offsetWidth;
   this.cont.style.width = "auto";
   this.cont.style.marginLeft = Math.max(0, Math.round(w1 / 2 - this.cont.offsetWidth / 2)) + "px";
   t = null;
 };
 
 // common app settings
-var A = {
+let A = {
   deviceOrient: (typeof (window.orientation) == "undefined" ? (window.innerWidth > window.innerHeight ? "landscape" : "portrait") : doOnRotate()),
   deviceType: (function (i) { return (i < 1024 ? "phone" : (i < 1280 ? "tablet" : "desktop")); })(Math.max(screen.width, screen.height)),
   server: "server/",
@@ -40,7 +40,7 @@ function doOnUnload() {
 
 // common rotate callback
 function doOnRotate(e) {
-  var deviceOrient = (window.orientation == 0 || window.orientation == 180 ? "portrait" : "landscape");
+  let deviceOrient = (window.orientation == 0 || window.orientation == 180 ? "portrait" : "landscape");
   if (typeof (e) == "undefined") return deviceOrient;
   if (A != null) A.deviceOrient = deviceOrient;
   window.dhx4.callEvent("onOrientationChange", [deviceOrient]);
@@ -55,8 +55,8 @@ if (typeof (window.addEventListener) == "function") {
 }
 
 //// # THE MAIN LAYOUT
-var mainSidebar;
-var mainToolbar;
+let mainSidebar;
+let mainToolbar;
 
 function appInit() {
   mainSidebar = new dhtmlXSideBar({
@@ -103,9 +103,9 @@ window.addEventListener('load', appInit);
 window.addEventListener('beforeunload', appUnload);
 
 /// CONTACTS
-var contactsGrid;
-var contactsLayout;
-var contactsForm;
+let contactsGrid;
+let contactsLayout;
+let contactsForm;
 
 function contactsInit(cell) {
   if (contactsLayout == null) {
@@ -188,12 +188,12 @@ function contactsInit(cell) {
 }
 
 /// PROJECTS
-var projectsGrid;
-var projectsLayout;
-var projectsTabbar;
-var projectsChart;
-var projectsChartId;
-var projectsForm;
+let projectsGrid;
+let projectsLayout;
+let projectsTabbar;
+let projectsChart;
+let projectsChartId;
+let projectsForm;
 
 function projectsInit(cell) {
   if (projectsLayout == null) {
@@ -315,9 +315,9 @@ function updateChart(id) {
 
 function projectsFillForm(id) {
   // update form
-  var data = projectsForm.getFormData();
-  for (var a in data) {
-    var index = projectsGrid.getColIndexById(a);
+  let data = projectsForm.getFormData();
+  for (let a in data) {
+    let index = projectsGrid.getColIndexById(a);
     if (index != null && index >= 0) data[a] = String(projectsGrid.cells(id, index).getValue()).replace(/\&amp;?/gi, "&");
   }
   data.id = id;
@@ -331,9 +331,9 @@ window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
 });
 
 /// EVENTS
-var eventsDataView;
-var eventsLayout;
-var eventsMap;
+let eventsDataView;
+let eventsLayout;
+let eventsMap;
 
 function eventsInit(cell) {
 
@@ -378,9 +378,9 @@ window.dhx4.attachEvent("onSidebarSelect", function (id, cell) {
 });
 
 /// SETTINGS
-var settingsDataView;
-var settingsLayout;
-var settingsForm;
+let settingsDataView;
+let settingsLayout;
+let settingsForm;
 
 function settingsInit(cell) {
 
@@ -419,7 +419,7 @@ function settingsInit(cell) {
       let name = setting.name;
 
       // attach form
-      var formData = [];
+      let formData = [];
       formData.push({ type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 });
       formData = formData.concat(settingsFormStruct[name]);
       settingsForm = settingsLayout.cells("b").attachForm(formData);
@@ -626,16 +626,16 @@ window.settingsFormStruct = {
 /// COMMON
 function contactsFillForm(id) {
   // update form
-  var data = contactsForm.getFormData();
-  for (var a in data) {
-    var index = contactsGrid.getColIndexById(a);
+  let data = contactsForm.getFormData();
+  for (let a in data) {
+    let index = contactsGrid.getColIndexById(a);
     if (index != null && index >= 0) data[a] = String(contactsGrid.cells(id, index).getValue()).replace(/\&amp;?/gi, "&");
   }
   data.id = id;
   contactsForm.setFormData(data);
   // change photo
-  var img = contactsGrid.cells(id, contactsGrid.getColIndexById("photo")).getValue(); // <img src=....>
-  var src = img.match(/src=\"([^\"]*)\"/)[1];
+  let img = contactsGrid.cells(id, contactsGrid.getColIndexById("photo")).getValue(); // <img src=....>
+  let src = img.match(/src=\"([^\"]*)\"/)[1];
   contactsForm.getContainer("photo").innerHTML = "<img src='imgs/contacts/big/" + src.match(/[^\/]*$/)[0] + "' border='0' class='form_photo'>";
 }
 

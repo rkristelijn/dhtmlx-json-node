@@ -151,13 +151,11 @@ function contactsInit(cell) {
     // attach custom event after change
     contactsForm.attachEvent("onAfterChange", (rowId, field, value) => {
       fieldIndex = contactsGrid.getColIndexById(field);
-      console.log('contactsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
       contactsGrid.cells(rowId, fieldIndex).setValue(value);
     });
 
     // attach custom event after added
     contactsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId, values) => {
-      console.log('contactsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId, values);
       contactsGrid.changeRowId(tempRowId, serverRowId);
       //pre-defaults, if any
       contactsGrid.cells(serverRowId, 0).setValue(values.photo);
@@ -165,7 +163,6 @@ function contactsInit(cell) {
 
     mainToolbar.attachEvent("onClick", (buttonId) => {
       if (mainSidebar.getActiveItem() === 'contacts') {
-        console.log("mainToolbar/contact", "onClick", buttonId);
         let rowId;
         switch (buttonId) {
           case "add":
@@ -252,20 +249,17 @@ function projectsInit(cell) {
     // attach custom event after change
     projectsForm.attachEvent("onAfterChange", (rowId, field, value) => {
       fieldIndex = projectsGrid.getColIndexById(field);
-      console.log('projectsForm', 'onAfterChange', 'CUSTOM EVENT!', rowId, field, value, fieldIndex);
       projectsGrid.cells(rowId, fieldIndex).setValue(value);
     });
 
     // attach custom event after added
     projectsGrid.attachEvent("onAfterRowAdded", (tempRowId, serverRowId, values) => {
-      console.log('projectsGrid', 'onAfterRowAdded', 'CUSTOM EVENT!', tempRowId, serverRowId, values);
       projectsGrid.changeRowId(tempRowId, serverRowId);
     });
 
     // connect the events on the tabbar
     mainToolbar.attachEvent("onClick", (buttonId) => {
       if (mainSidebar.getActiveItem() === 'projects') {
-        console.log("mainToolbar/projects", "onClick", buttonId);
         let rowId;
         switch (buttonId) {
           case "add":
@@ -371,6 +365,11 @@ function eventsInit(cell) {
     });
 
     eventsDataView.load("api/events?type=" + A.deviceType, "json");
+
+    // fires when the data loading is finished and a component or data is rendered
+    eventsDataView.attachEvent("onXLE", function () {
+      eventsDataView.select(eventsDataView.first());
+    });
   }
 }
 
@@ -415,10 +414,14 @@ function settingsInit(cell) {
     });
 
     settingsDataView.attachEvent("onAfterSelect", function (id) {
+      //translate mongodb.id to name
+      let setting = settingsDataView.get(id);
+      let name = setting.name;
+
       // attach form
       var formData = [];
       formData.push({ type: "settings", position: "label-left", labelWidth: 110, inputWidth: 160 });
-      formData = formData.concat(settingsFormStruct[id]);
+      formData = formData.concat(settingsFormStruct[name]);
       settingsForm = settingsLayout.cells("b").attachForm(formData);
       settingsForm.setSizes = settingsForm.centerForm;
       settingsForm.setSizes();
@@ -429,7 +432,7 @@ function settingsInit(cell) {
 
     // fires when the data loading is finished and a component or data is rendered
     settingsDataView.attachEvent("onXLE", function () {
-      settingsDataView.select("contacts");
+      settingsDataView.select(settingsDataView.first());
     });
 
   }
@@ -650,10 +653,8 @@ function attachDpForm(obj, objectName, url) {
   // onChange	fires when data in some input was changed
   obj.attachEvent('onChange', (itemName, value, state) => {
     //state = checked/unchecked (for checkboxes and radios only)
-    console.log(objectName, 'onChange', itemName, value, state);
     let rowId = obj.getItemValue('id');
     let request = `{"${itemName}":"${value}"}`;
-    console.log(objectName, 'request', JSON.parse(request), rowId);
     fetch(`${url}${rowId}`, {
       headers: {
         'Content-Type': 'application/json'
@@ -663,17 +664,14 @@ function attachDpForm(obj, objectName, url) {
     })
       .then(response => response.json())
       .then(response => {
-        console.log(objectName, 'response', response);
         obj.callEvent("onAfterChange", [rowId, itemName, value]);
       })
-      .catch(err => { console.error(err) });
   });
 }
 
 function attachDpGrid(obj, objectName, url) {
   //fires after a row has been deleted from the grid
   obj.attachEvent('onAfterRowDeleted', (id, pid) => {
-    console.log(objectName, 'onAfterRowDeleted', id, pid);
     fetch(`${url}${id}`, {
       headers: {
         'Content-Type': 'application/json'
@@ -681,9 +679,7 @@ function attachDpGrid(obj, objectName, url) {
       method: 'DELETE'
     })
       .then(response => {
-        console.log(objectName, 'response', response.statusText);
       })
-      .catch(err => { console.error(err) });
   });
   //fires 1-3 times depending on cell's editability (see the stage parameter)
   obj.attachEvent('onEditCell', (stage, rowId, colIndex, newValue, oldValue) => {
@@ -695,7 +691,6 @@ function attachDpGrid(obj, objectName, url) {
     if (stage === editorClosed & newValue !== oldValue) {
       let fieldName = obj.getColumnId(colIndex);
       let request = `{"${fieldName}":"${newValue}"}`;
-      console.log(objectName, 'request', JSON.parse(request));
       fetch(`${url}${rowId}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -705,16 +700,13 @@ function attachDpGrid(obj, objectName, url) {
       })
         .then(response => response.json())
         .then(response => {
-          console.log(objectName, 'response', response);
         })
-        .catch(err => { console.error(err) });
 
       return true;
     }
   });
   //fires right after a row has been added to the grid
   obj.attachEvent('onRowAdded', (rId) => {
-    console.log(objectName, 'onRowAdded', rId);
     fetch(`${url}`, {
       headers: {
         'Content-Type': 'application/json'
@@ -723,9 +715,7 @@ function attachDpGrid(obj, objectName, url) {
     })
       .then(response => response.json())
       .then(response => {
-        console.log(objectName, 'response', response);
         obj.callEvent("onAfterRowAdded", [rId, response._id, response]);
       })
-      .catch(err => { console.error(err) });
   });
 }

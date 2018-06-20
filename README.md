@@ -4,6 +4,16 @@
 
 This is a short tutorial to set up dhtmlx (dhx) using only JSON and node/mongodb as a back-end and the REST API. Recently I followed the ['Your First App'](https://docs.dhtmlx.com/tutorials__first_app__index.html) tutorial and felt unsatisfied with what I've learned. So I decided to push a little harder and use a demo app ['CRM System'](https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) as the base and create my own tutorial.
 
+Update: 20-JUN-2018: this project focuses on getting the framework up and running, interaction with different components and creating and connecting to the back-end. It doesn't concern optimizing the front-end in terms of code overview, readeability, systainability for changes and so on, but [this project does](https://github.com/rkristelijn/optimus-start) using [DHTMLX.com](https://docs.dhtmlx.com/optimus__index.html)
+
+# [DHTMLX Optimus Framework](https://docs.dhtmlx.com/optimus__index.html)
+
+DHTMLX Optimus is a micro framework for building DHTMLX-based apps.
+The framework enforces consistent application structure by breaking a monolithic application into a set of reusable classes. As a result, each part of an app can be developed and tested independently and used in various combinations.
+DHTMLX Optimus is a fully client-side solution. There aren't any special requirements to the server. You can use any data REST backend (PHP, Nodejs, .Net, Java, etc.) 
+
+This project only makes the proposed ['CRM System'] demo(https://dhtmlx.com/docs/products/demoApps/dhtmlxCRMSystem/index.html) work end-to-end, using fetch, and a REST API using Node.
+
 # Contents
 - [Motivational speech](#why)
 - [Screenshots](#example)
